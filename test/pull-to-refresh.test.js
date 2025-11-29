@@ -234,50 +234,52 @@ describe('PullToRefreshElement', () => {
 	});
 
 	describe('Text Selection Control', () => {
-	it('should not add pulling attribute when disable-selection is false', () => {
-		// Simulate pull start
-		const startEvent = new PointerEvent('pointerdown', {
-			clientY: 100,
+		it('should not add pulling attribute when disable-selection is false', () => {
+			// Simulate pull start
+			const startEvent = new PointerEvent('pointerdown', {
+				clientY: 100,
+			});
+			element.handleStart(startEvent);
+
+			expect(element.hasAttribute('pulling')).toBe(false);
 		});
-		element.handleStart(startEvent);
+		it('should add pulling attribute when disable-selection is true', () => {
+			element.disableSelection = true;
 
-		expect(element.hasAttribute('pulling')).toBe(false);
-	});	it('should add pulling attribute when disable-selection is true', () => {
-		element.disableSelection = true;
+			// Need to simulate a downward pull to confirm direction
+			const startEvent = new PointerEvent('pointerdown', {
+				clientY: 100,
+			});
+			element.handleStart(startEvent);
 
-		// Need to simulate a downward pull to confirm direction
-		const startEvent = new PointerEvent('pointerdown', {
-			clientY: 100,
+			// Simulate downward movement to confirm pull direction
+			const moveEvent = new PointerEvent('pointermove', {
+				clientY: 110, // 10px downward
+			});
+			element.handleMove(moveEvent);
+
+			expect(element.hasAttribute('pulling')).toBe(true);
 		});
-		element.handleStart(startEvent);
+		it('should remove pulling attribute on pull end', () => {
+			element.disableSelection = true;
 
-		// Simulate downward movement to confirm pull direction
-		const moveEvent = new PointerEvent('pointermove', {
-			clientY: 110, // 10px downward
+			// Simulate pull start
+			const startEvent = new PointerEvent('pointerdown', {
+				clientY: 100,
+			});
+			element.handleStart(startEvent);
+
+			// Simulate downward movement to confirm pull direction
+			const moveEvent = new PointerEvent('pointermove', {
+				clientY: 110, // 10px downward
+			});
+			element.handleMove(moveEvent);
+			expect(element.hasAttribute('pulling')).toBe(true);
+
+			// Simulate pull end
+			element.handleEnd();
+			expect(element.hasAttribute('pulling')).toBe(false);
 		});
-		element.handleMove(moveEvent);
-
-		expect(element.hasAttribute('pulling')).toBe(true);
-	});	it('should remove pulling attribute on pull end', () => {
-		element.disableSelection = true;
-
-		// Simulate pull start
-		const startEvent = new PointerEvent('pointerdown', {
-			clientY: 100,
-		});
-		element.handleStart(startEvent);
-
-		// Simulate downward movement to confirm pull direction
-		const moveEvent = new PointerEvent('pointermove', {
-			clientY: 110, // 10px downward
-		});
-		element.handleMove(moveEvent);
-		expect(element.hasAttribute('pulling')).toBe(true);
-
-		// Simulate pull end
-		element.handleEnd();
-		expect(element.hasAttribute('pulling')).toBe(false);
-	});
 	});
 
 	describe('Disabled State', () => {
