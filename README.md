@@ -325,7 +325,7 @@ PullToRefreshElement.registerTranslations({
 You can always override translations for individual instances:
 
 ```html
-<pull-to-refresh 
+<pull-to-refresh
   lang="es"
   indicator-text="Custom Spanish text"
   release-text="Custom release text">
