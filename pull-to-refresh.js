@@ -322,9 +322,18 @@ export class PullToRefreshElement extends HTMLElement {
 		const indicator = this.shadowRoot.querySelector('.ptr-indicator');
 		if (!indicator) return;
 
+		// Temporarily disable announcements during reset
+		indicator.setAttribute('aria-live', 'off');
+
 		indicator.style.transform = `translateY(${-this.indicatorHeight}px)`;
 		indicator.classList.remove('active');
 		indicator.textContent = this.indicatorText;
+
+		// Re-enable announcements after text is updated
+		// Use setTimeout to ensure the text change happens first
+		setTimeout(() => {
+			indicator.setAttribute('aria-live', 'assertive');
+		}, 0);
 	}
 
 	updateIndicatorText() {
@@ -450,7 +459,7 @@ export class PullToRefreshElement extends HTMLElement {
 				}
 			</style>
 			<div class="ptr-container">
-				<div class="ptr-indicator">
+				<div class="ptr-indicator" role="status" aria-live="assertive">
 					<slot name="indicator">${this.indicatorText}</slot>
 				</div>
 				<div class="ptr-content">
