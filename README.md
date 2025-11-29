@@ -334,7 +334,7 @@ You can always override translations for individual instances:
 </pull-to-refresh>
 ```
 
-## 🧪 Testing
+## Testing
 
 ```bash
 npm test               # Run tests in watch mode
@@ -343,7 +343,7 @@ npm run test:ui        # Open Vitest UI
 npm run test:coverage  # Generate coverage report
 ```
 
-## 🛠️ Development
+## Development
 
 ```bash
 npm install            # Install dependencies
@@ -352,7 +352,7 @@ npm run lint           # Lint code
 npm run format         # Format code
 ```
 
-## 🌐 Browser Support
+## Browser Support
 
 Works in all modern browsers supporting:
 - Custom Elements v1
@@ -362,7 +362,7 @@ Works in all modern browsers supporting:
 
 For legacy browsers, use appropriate polyfills.
 
-## 📦 Package Exports
+## Package Exports
 
 ```javascript
 // Auto-define
@@ -378,15 +378,15 @@ import { PullToRefreshElement } from '@aarongustafson/pull-to-refresh';
 import '@aarongustafson/pull-to-refresh/define.js';
 ```
 
-## 🤝 Contributing
+## Contributing
 
 Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-## 📄 License
+## License
 
 MIT - See [LICENSE](LICENSE)
 
-## 🙏 Credits
+## Credits
 
 Created by [Aaron Gustafson](https://github.com/aarongustafson)
 
