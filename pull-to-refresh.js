@@ -21,10 +21,10 @@ import defaultTranslations from './translations.json' with { type: 'json' };
  * @slot - Default slot for content
  * @slot indicator - Optional custom indicator element
  *
- * @cssprop --ptr-indicator-height - Height of the indicator area (default: 50px)
+ * @cssprop --ptr-indicator-height - Height of the indicator area (default: 3.125rem)
  * @cssprop --ptr-indicator-bg - Background color of the indicator (default: transparent)
- * @cssprop --ptr-indicator-color - Text color of the indicator (default: #555)
- * @cssprop --ptr-indicator-font-size - Font size of the indicator text (default: 14px)
+ * @cssprop --ptr-indicator-color - Text color of the indicator (default: CanvasText)
+ * @cssprop --ptr-indicator-font-size - Font size of the indicator text (default: 0.875rem)
  * @cssprop --ptr-transition-duration - Duration of indicator transitions (default: 0.2s)
  */
 export class PullToRefreshElement extends HTMLElement {
@@ -325,7 +325,7 @@ export class PullToRefreshElement extends HTMLElement {
 
 	// eslint-disable-next-line class-methods-use-this
 	get indicatorHeight() {
-		return 50; // Can be made dynamic if needed
+		return 50; // 3.125rem in pixels (assuming 16px base)
 	}
 
 	render() {
@@ -355,14 +355,14 @@ export class PullToRefreshElement extends HTMLElement {
 					top: 0;
 					left: 0;
 					right: 0;
-					height: var(--ptr-indicator-height, 50px);
+					height: var(--ptr-indicator-height, 3.125rem);
 					display: flex;
-					align-items: center;
-					justify-content: center;
-					background: var(--ptr-indicator-bg, transparent);
-					color: var(--ptr-indicator-color, #555);
-					font-size: var(--ptr-indicator-font-size, 14px);
-					transform: translateY(-50px);
+				align-items: center;
+				justify-content: center;
+				background: var(--ptr-indicator-bg, transparent);
+				color: var(--ptr-indicator-color, CanvasText);
+				font-size: var(--ptr-indicator-font-size, 0.875rem);
+					transform: translateY(-3.125rem);
 					transition: transform var(--ptr-transition-duration, 0.2s) ease;
 					z-index: 1000;
 					user-select: none;
