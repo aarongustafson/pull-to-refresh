@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Custom Text Pull-to-Refresh Demo</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			html,
+			body {
+				height: 100%;
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
+					Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+			}
+
+			pull-to-refresh {
+				height: 100%;
+				--ptr-indicator-bg: #f0f0f0;
+				--ptr-indicator-color: #333;
+			}
+
+			.demo-content {
+				padding: 20px;
+			}
+
+			.demo-content h3 {
+				margin-top: 0;
+				margin-bottom: 1rem;
+			}
+
+			.status {
+				background: #e3f2fd;
+				padding: 10px;
+				margin: 10px 0;
+				border-radius: 4px;
+				font-family: monospace;
+				font-size: 12px;
+			}
+
+			.random-number {
+				font-weight: bold;
+				color: #1976d2;
+			}
+		</style>
+	</head>
+	<body>
+		<pull-to-refresh
+			id="demo"
+			indicator-text="⬇ Swipe down"
+			release-text="🔄 Let go!"
+			refreshing-text="⏳ Loading..."
+		>
+			<div class="demo-content">
+				<h3>Custom Messages</h3>
+				<p>Notice the different indicator text.</p>
+				<p>
+					Random number:
+					<span class="random-number" id="random">0</span>
+				</p>
+				<div class="status" id="status">Ready</div>
+			</div>
+		</pull-to-refresh>
+
+		<script src="../define.js" type="module"></script>
+		<script>
+			const demo = document.getElementById('demo');
+			const random = document.getElementById('random');
+			const status = document.getElementById('status');
+
+			demo.addEventListener('ptr:refresh', (e) => {
+				status.textContent = 'Refreshing...';
+				setTimeout(() => {
+					random.textContent = Math.floor(Math.random() * 1000);
+					e.detail.complete();
+				}, 1500);
+			});
+
+			demo.addEventListener('ptr:refresh-complete', () => {
+				status.textContent = 'Complete! Pull again to refresh.';
+			});
+		</script>
+	</body>
+</html>
