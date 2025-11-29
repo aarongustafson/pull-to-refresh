@@ -19,41 +19,11 @@
 				overflow: hidden;
 			}
 
-			.demo pull-to-refresh {
+			.demo iframe {
+				width: 100%;
 				height: 300px;
-			}
-
-			.demo-content {
-				padding: 20px;
-			}
-
-			.demo-content h3 {
-				margin-top: 0;
-			}
-
-			.status {
-				background: #e3f2fd;
-				padding: 10px;
-				margin: 10px 0;
-				border-radius: 4px;
-				font-family: monospace;
-				font-size: 12px;
-			}
-
-			.random-number {
-				font-weight: bold;
-				color: #1976d2;
-			}
-
-			pull-to-refresh {
-				--ptr-indicator-bg: #f0f0f0;
-				--ptr-indicator-color: #333;
-			}
-
-			.full-height-demo {
-				height: 100vh;
-				margin: 0;
-				padding: 0;
+				border: none;
+				display: block;
 			}
 		</style>
 	</head>
@@ -95,22 +65,10 @@
   &lt;/div&gt;
 &lt;/pull-to-refresh&gt;</code></pre>
 						<div class="demo">
-							<pull-to-refresh id="demo1">
-								<div class="demo-content">
-									<h3>My Content</h3>
-									<p>
-										Scroll down and pull from the top to
-										refresh.
-									</p>
-									<p>
-										Random number:
-										<span class="random-number" id="random1"
-											>0</span
-										>
-									</p>
-									<div class="status" id="status1">Ready</div>
-								</div>
-							</pull-to-refresh>
+							<iframe
+								src="basic.html"
+								title="Basic pull-to-refresh demo"
+							></iframe>
 						</div>
 					</div>
 				</div>
@@ -134,19 +92,10 @@
   &lt;/div&gt;
 &lt;/pull-to-refresh&gt;</code></pre>
 						<div class="demo">
-							<pull-to-refresh id="demo2" threshold="120">
-								<div class="demo-content">
-									<h3>Custom Threshold (120px)</h3>
-									<p>Pull down further to trigger refresh.</p>
-									<p>
-										Random number:
-										<span class="random-number" id="random2"
-											>0</span
-										>
-									</p>
-									<div class="status" id="status2">Ready</div>
-								</div>
-							</pull-to-refresh>
+							<iframe
+								src="threshold.html"
+								title="Custom threshold pull-to-refresh demo"
+							></iframe>
 						</div>
 					</div>
 				</div>
@@ -170,24 +119,10 @@
   &lt;/div&gt;
 &lt;/pull-to-refresh&gt;</code></pre>
 						<div class="demo">
-							<pull-to-refresh
-								id="demo3"
-								indicator-text="⬇ Swipe down"
-								release-text="🔄 Let go!"
-								refreshing-text="⏳ Loading..."
-							>
-								<div class="demo-content">
-									<h3>Custom Messages</h3>
-									<p>Notice the different indicator text.</p>
-									<p>
-										Random number:
-										<span class="random-number" id="random3"
-											>0</span
-										>
-									</p>
-									<div class="status" id="status3">Ready</div>
-								</div>
-							</pull-to-refresh>
+							<iframe
+								src="custom-text.html"
+								title="Custom text pull-to-refresh demo"
+							></iframe>
 						</div>
 					</div>
 				</div>
@@ -211,19 +146,10 @@
   &lt;/div&gt;
 &lt;/pull-to-refresh&gt;</code></pre>
 						<div class="demo">
-							<pull-to-refresh id="demo4" lang="es">
-								<div class="demo-content">
-									<h3>Contenido en Español</h3>
-									<p>Los mensajes aparecen en español.</p>
-									<p>
-										Número aleatorio:
-										<span class="random-number" id="random4"
-											>0</span
-										>
-									</p>
-									<div class="status" id="status4">Listo</div>
-								</div>
-							</pull-to-refresh>
+							<iframe
+								src="spanish.html"
+								title="Spanish pull-to-refresh demo"
+							></iframe>
 						</div>
 					</div>
 				</div>
@@ -238,21 +164,10 @@
   &lt;/div&gt;
 &lt;/pull-to-refresh&gt;</code></pre>
 						<div class="demo">
-							<pull-to-refresh id="demo5" lang="fr">
-								<div class="demo-content">
-									<h3>Contenu en Français</h3>
-									<p>
-										Les messages apparaissent en français.
-									</p>
-									<p>
-										Numéro aléatoire:
-										<span class="random-number" id="random5"
-											>0</span
-										>
-									</p>
-									<div class="status" id="status5">Prêt</div>
-								</div>
-							</pull-to-refresh>
+							<iframe
+								src="french.html"
+								title="French pull-to-refresh demo"
+							></iframe>
 						</div>
 					</div>
 				</div>
@@ -267,21 +182,10 @@
   &lt;/div&gt;
 &lt;/pull-to-refresh&gt;</code></pre>
 						<div class="demo">
-							<pull-to-refresh id="demo6" lang="ja">
-								<div class="demo-content">
-									<h3>日本語のコンテンツ</h3>
-									<p>メッセージが日本語で表示されます。</p>
-									<p>
-										ランダム番号:
-										<span class="random-number" id="random6"
-											>0</span
-										>
-									</p>
-									<div class="status" id="status6">
-										準備完了
-									</div>
-								</div>
-							</pull-to-refresh>
+							<iframe
+								src="japanese.html"
+								title="Japanese pull-to-refresh demo"
+							></iframe>
 						</div>
 					</div>
 				</div>
@@ -414,113 +318,5 @@
 				>.
 			</p>
 		</footer>
-
-		<script src="../define.js" type="module"></script>
-		<script>
-			// Demo 1 - Basic
-			const demo1 = document.getElementById('demo1');
-			const random1 = document.getElementById('random1');
-			const status1 = document.getElementById('status1');
-
-			demo1.addEventListener('ptr:refresh', (e) => {
-				status1.textContent = 'Refreshing...';
-				setTimeout(() => {
-					random1.textContent = Math.floor(Math.random() * 1000);
-					e.detail.complete();
-				}, 1500);
-			});
-
-			demo1.addEventListener('ptr:refresh-complete', () => {
-				status1.textContent = 'Complete! Pull again to refresh.';
-			});
-
-			// Demo 2 - Custom threshold
-			const demo2 = document.getElementById('demo2');
-			const random2 = document.getElementById('random2');
-			const status2 = document.getElementById('status2');
-
-			demo2.addEventListener('ptr:refresh', (e) => {
-				status2.textContent = 'Refreshing...';
-				setTimeout(() => {
-					random2.textContent = Math.floor(Math.random() * 1000);
-					e.detail.complete();
-				}, 1500);
-			});
-
-			demo2.addEventListener('ptr:refresh-complete', () => {
-				status2.textContent = 'Complete! Pull again to refresh.';
-			});
-
-			// Demo 3 - Custom text
-			const demo3 = document.getElementById('demo3');
-			const random3 = document.getElementById('random3');
-			const status3 = document.getElementById('status3');
-
-			demo3.addEventListener('ptr:refresh', (e) => {
-				status3.textContent = 'Refreshing...';
-				setTimeout(() => {
-					random3.textContent = Math.floor(Math.random() * 1000);
-					e.detail.complete();
-				}, 1500);
-			});
-
-			demo3.addEventListener('ptr:refresh-complete', () => {
-				status3.textContent = 'Complete! Pull again to refresh.';
-			});
-
-			// Demo 4 - Spanish
-			const demo4 = document.getElementById('demo4');
-			const random4 = document.getElementById('random4');
-			const status4 = document.getElementById('status4');
-
-			demo4.addEventListener('ptr:refresh', (e) => {
-				status4.textContent = 'Actualizando...';
-				setTimeout(() => {
-					random4.textContent = Math.floor(Math.random() * 1000);
-					e.detail.complete();
-				}, 1500);
-			});
-
-			demo4.addEventListener('ptr:refresh-complete', () => {
-				status4.textContent =
-					'¡Completo! Desliza de nuevo para actualizar.';
-			});
-
-			// Demo 5 - French
-			const demo5 = document.getElementById('demo5');
-			const random5 = document.getElementById('random5');
-			const status5 = document.getElementById('status5');
-
-			demo5.addEventListener('ptr:refresh', (e) => {
-				status5.textContent = 'Actualisation...';
-				setTimeout(() => {
-					random5.textContent = Math.floor(Math.random() * 1000);
-					e.detail.complete();
-				}, 1500);
-			});
-
-			demo5.addEventListener('ptr:refresh-complete', () => {
-				status5.textContent =
-					'Terminé! Tirez à nouveau pour actualiser.';
-			});
-
-			// Demo 6 - Japanese
-			const demo6 = document.getElementById('demo6');
-			const random6 = document.getElementById('random6');
-			const status6 = document.getElementById('status6');
-
-			demo6.addEventListener('ptr:refresh', (e) => {
-				status6.textContent = '更新中...';
-				setTimeout(() => {
-					random6.textContent = Math.floor(Math.random() * 1000);
-					e.detail.complete();
-				}, 1500);
-			});
-
-			demo6.addEventListener('ptr:refresh-complete', () => {
-				status6.textContent =
-					'完了！もう一度引っ張って更新してください。';
-			});
-		</script>
 	</body>
 </html>
