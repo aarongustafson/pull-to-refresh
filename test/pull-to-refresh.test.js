@@ -68,6 +68,14 @@ describe('PullToRefreshElement', () => {
 			element.removeAttribute('disabled');
 			expect(element.disabled).toBe(false);
 		});
+
+		it('should handle disable-selection attribute', () => {
+			expect(element.disableSelection).toBe(false);
+			element.setAttribute('disable-selection', '');
+			expect(element.disableSelection).toBe(true);
+			element.removeAttribute('disable-selection');
+			expect(element.disableSelection).toBe(false);
+		});
 	});
 
 	describe('Properties', () => {
@@ -96,6 +104,13 @@ describe('PullToRefreshElement', () => {
 			expect(element.hasAttribute('disabled')).toBe(true);
 			element.disabled = false;
 			expect(element.hasAttribute('disabled')).toBe(false);
+		});
+
+		it('should set disable-selection via property', () => {
+			element.disableSelection = true;
+			expect(element.hasAttribute('disable-selection')).toBe(true);
+			element.disableSelection = false;
+			expect(element.hasAttribute('disable-selection')).toBe(false);
 		});
 	});
 
@@ -215,6 +230,52 @@ describe('PullToRefreshElement', () => {
 
 			expect(completeHandler).toHaveBeenCalled();
 			expect(element.isRefreshing).toBe(false);
+		});
+	});
+
+	describe('Text Selection Control', () => {
+		it('should not add pulling class when disable-selection is false', () => {
+			const container =
+				element.shadowRoot.querySelector('.ptr-container');
+
+			// Simulate pull start
+			const startEvent = new PointerEvent('pointerdown', {
+				clientY: 100,
+			});
+			element.handleStart(startEvent);
+
+			expect(container.classList.contains('pulling')).toBe(false);
+		});
+
+		it('should add pulling class when disable-selection is true', () => {
+			element.disableSelection = true;
+			const container =
+				element.shadowRoot.querySelector('.ptr-container');
+
+			// Simulate pull start
+			const startEvent = new PointerEvent('pointerdown', {
+				clientY: 100,
+			});
+			element.handleStart(startEvent);
+
+			expect(container.classList.contains('pulling')).toBe(true);
+		});
+
+		it('should remove pulling class on pull end', () => {
+			element.disableSelection = true;
+			const container =
+				element.shadowRoot.querySelector('.ptr-container');
+
+			// Simulate pull start
+			const startEvent = new PointerEvent('pointerdown', {
+				clientY: 100,
+			});
+			element.handleStart(startEvent);
+			expect(container.classList.contains('pulling')).toBe(true);
+
+			// Simulate pull end
+			element.handleEnd();
+			expect(container.classList.contains('pulling')).toBe(false);
 		});
 	});
 
