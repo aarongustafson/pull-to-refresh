@@ -127,10 +127,10 @@ If you don't call `complete()`, the component will auto-complete after 2 seconds
 
 | Property | Default | Description |
 |----------|---------|-------------|
-| `--ptr-indicator-height` | `50px` | Height of the indicator area |
+| `--ptr-indicator-height` | `3.125rem` | Height of the indicator area |
 | `--ptr-indicator-bg` | `transparent` | Background color of indicator |
-| `--ptr-indicator-color` | `#555` | Text color of indicator |
-| `--ptr-indicator-font-size` | `14px` | Font size of indicator text |
+| `--ptr-indicator-color` | `CanvasText` | Text color of indicator |
+| `--ptr-indicator-font-size` | `0.875rem` | Font size of indicator text |
 | `--ptr-transition-duration` | `0.2s` | Duration of indicator transitions |
 
 ### Methods
@@ -197,8 +197,8 @@ PullToRefreshElement.registerTranslations({
   pull-to-refresh {
     --ptr-indicator-bg: #f0f0f0;
     --ptr-indicator-color: #1976d2;
-    --ptr-indicator-font-size: 16px;
-    --ptr-indicator-height: 60px;
+    --ptr-indicator-font-size: 1rem;
+    --ptr-indicator-height: 3.75rem;
   }
 </style>
 
