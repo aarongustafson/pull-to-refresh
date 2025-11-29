@@ -206,7 +206,11 @@ export class PullToRefreshElement extends HTMLElement {
 			clientY: e.clientY,
 			target: e.target,
 		});
-		if (this._container.scrollTop === 0 && !this.isRefreshing && !this.disabled) {
+		if (
+			this._container.scrollTop === 0 &&
+			!this.isRefreshing &&
+			!this.disabled
+		) {
 			console.log('[PTR] Starting pull (pending direction confirmation)');
 			this.isPulling = true;
 			this.isPullingConfirmed = false;
