@@ -80,6 +80,7 @@ import { PullToRefreshElement } from '@aarongustafson/pull-to-refresh';
 | `refreshing-text` | string | localized | Text shown while refreshing |
 | `lang` | string | auto-detected | Language code for localization |
 | `disabled` | boolean | `false` | Disables pull-to-refresh functionality |
+| `disable-selection` | boolean | `false` | Prevents text selection during pull gesture |
 
 **Note:** The text attributes use automatic localization based on the `lang` attribute or auto-detection. See [Localization](#-localization-i18n) below.
 
@@ -128,8 +129,8 @@ If you don't call `complete()`, the component will auto-complete after 2 seconds
 | Property | Default | Description |
 |----------|---------|-------------|
 | `--ptr-indicator-height` | `3.125rem` | Height of the indicator area |
-| `--ptr-indicator-bg` | `transparent` | Background color of indicator |
-| `--ptr-indicator-color` | `CanvasText` | Text color of indicator |
+| `--ptr-indicator-bg` | `ButtonFace` | Background color of indicator |
+| `--ptr-indicator-color` | `ButtonText` | Text color of indicator |
 | `--ptr-indicator-font-size` | `0.875rem` | Font size of indicator text |
 | `--ptr-transition-duration` | `0.2s` | Duration of indicator transitions |
 

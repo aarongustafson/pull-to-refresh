@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Basic Pull-to-Refresh Demo</title>
+		<title>Disabled Text Selection - Pull-to-Refresh Demo</title>
 		<style>
 			* {
 				margin: 0;
@@ -39,41 +39,52 @@
 				font-family: monospace;
 				font-size: 0.75rem;
 			}
-			.random-number {
-				font-weight: bold;
-				color: LinkText;
+
+			.highlight {
+				background: Mark;
+				color: MarkText;
+				padding: 0.25rem 0.5rem;
+				border-radius: 4px;
+				display: inline-block;
+				margin-top: 0.5rem;
 			}
 		</style>
 	</head>
 	<body>
-		<pull-to-refresh id="demo">
+		<pull-to-refresh id="demo" disable-selection>
 			<div class="demo-content">
-				<h3>My Content</h3>
-				<p>Scroll down and pull from the top to refresh.</p>
+				<h3>With disable-selection</h3>
 				<p>
-					Random number:
-					<span class="random-number" id="random">0</span>
+					Try selecting this text while pulling down. Selection is
+					blocked during the pull gesture to prevent accidents.
 				</p>
-				<div class="status" id="status">Ready</div>
+				<p class="highlight">
+					🚫 Selection blocked during pull gesture
+				</p>
+				<div class="status" id="status">
+					Pull down to refresh (selection disabled during pull)
+				</div>
 			</div>
 		</pull-to-refresh>
 
 		<script src="../define.js" type="module"></script>
 		<script>
 			const demo = document.getElementById('demo');
-			const random = document.getElementById('random');
 			const status = document.getElementById('status');
 
 			demo.addEventListener('ptr:refresh', (e) => {
 				status.textContent = 'Refreshing...';
 				setTimeout(() => {
-					random.textContent = Math.floor(Math.random() * 1000);
 					e.detail.complete();
-				}, 1500);
+				}, 1000);
 			});
 
 			demo.addEventListener('ptr:refresh-complete', () => {
-				status.textContent = 'Complete! Pull again to refresh.';
+				status.textContent = 'Complete! (selection was disabled)';
+				setTimeout(() => {
+					status.textContent =
+						'Pull down to refresh (selection disabled during pull)';
+				}, 2000);
 			});
 		</script>
 	</body>

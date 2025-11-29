@@ -9,12 +9,12 @@
 			/* Demo-specific styles */
 			body {
 				margin: 0;
-				background: #f5f5f5;
 			}
 
 			.demo {
-				background: white;
-				border: 1px solid #ddd;
+				background: Canvas;
+				color: CanvasText;
+				border: 1px solid;
 				border-radius: 4px;
 				overflow: hidden;
 			}
@@ -30,16 +30,16 @@
 				display: block;
 				padding: 8px 12px;
 				text-align: center;
-				background: #f0f0f0;
-				border-top: 1px solid #ddd;
-				color: #1976d2;
+				background: Canvas;
+				border-top: 1px solid;
+				color: LinkText;
 				text-decoration: none;
 				font-size: 0.875rem;
 				transition: background 0.2s;
 			}
 
 			.demo-link:hover {
-				background: #e0e0e0;
+				background: SelectedItem;
 			}
 
 			.demo-link::after {
@@ -78,13 +78,13 @@
 						<code>ptr:refresh</code> event.
 					</p>
 					<div class="code-demo-pair">
-						<pre><code>&lt;pull-to-refresh&gt;
+						<pre><code><mark>&lt;pull-to-refresh&gt;</mark>
   &lt;div class="content"&gt;
     &lt;h3&gt;My Content&lt;/h3&gt;
     &lt;p&gt;Pull down to refresh&lt;/p&gt;
     &lt;p&gt;Random: &lt;span id="random1"&gt;0&lt;/span&gt;&lt;/p&gt;
   &lt;/div&gt;
-&lt;/pull-to-refresh&gt;</code></pre>
+<mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
 						<div class="demo">
 							<iframe
 								src="basic.html"
@@ -113,11 +113,11 @@
 					<h3>Using threshold Attribute</h3>
 					<p>You need to pull further down to trigger the refresh.</p>
 					<div class="code-demo-pair">
-						<pre><code>&lt;pull-to-refresh threshold="120"&gt;
+						<pre><code><mark>&lt;pull-to-refresh threshold="120"&gt;</mark>
   &lt;div class="content"&gt;
     &lt;p&gt;Pull 120px to refresh&lt;/p&gt;
   &lt;/div&gt;
-&lt;/pull-to-refresh&gt;</code></pre>
+<mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
 						<div class="demo">
 							<iframe
 								src="threshold.html"
@@ -143,14 +143,14 @@
 					<h3>Custom Messages</h3>
 					<p>Using custom text for the indicator states.</p>
 					<div class="code-demo-pair">
-						<pre><code>&lt;pull-to-refresh
+						<pre><code><mark>&lt;pull-to-refresh
   indicator-text="⬇ Swipe down"
   release-text="🔄 Let go!"
-  refreshing-text="⏳ Loading..."&gt;
+  refreshing-text="⏳ Loading..."&gt;</mark>
   &lt;div class="content"&gt;
     &lt;p&gt;Custom messages&lt;/p&gt;
   &lt;/div&gt;
-&lt;/pull-to-refresh&gt;</code></pre>
+<mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
 						<div class="demo">
 							<iframe
 								src="custom-text.html"
@@ -167,6 +167,42 @@
 				</div>
 			</section>
 
+			<!-- Disable Selection Example -->
+			<section>
+				<h2>Disable Text Selection</h2>
+				<p>
+					By default, text selection is allowed during pull gestures.
+					Use the <code>disable-selection</code> attribute to prevent
+					accidental text selection while pulling.
+				</p>
+
+				<div class="demo-section">
+					<h3>Using disable-selection Attribute</h3>
+					<p>
+						Text selection is blocked during the pull gesture. Try
+						selecting text while pulling down to see the difference.
+					</p>
+					<div class="code-demo-pair">
+						<pre><code><mark>&lt;pull-to-refresh disable-selection&gt;</mark>
+  &lt;div class="content"&gt;
+    &lt;p&gt;Selection blocked during pull&lt;/p&gt;
+  &lt;/div&gt;
+<mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
+						<div class="demo">
+							<iframe
+								src="selection-disabled.html"
+								title="Disabled text selection pull-to-refresh demo"
+							></iframe>
+							<a
+								href="selection-disabled.html"
+								target="_blank"
+								class="demo-link"
+								>Open in new window</a
+							>
+						</div>
+					</div>
+				</div>
+			</section>
 			<!-- Localization Example -->
 			<section>
 				<h2>Localization (i18n)</h2>
@@ -179,11 +215,11 @@
 					<h3>Spanish (Español)</h3>
 					<p>Using the <code>lang="es"</code> attribute.</p>
 					<div class="code-demo-pair">
-						<pre><code>&lt;pull-to-refresh lang="es"&gt;
+						<pre><code><mark>&lt;pull-to-refresh lang="es"&gt;</mark>
   &lt;div class="content"&gt;
     &lt;p&gt;Contenido en español&lt;/p&gt;
   &lt;/div&gt;
-&lt;/pull-to-refresh&gt;</code></pre>
+<mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
 						<div class="demo">
 							<iframe
 								src="spanish.html"
@@ -203,11 +239,11 @@
 					<h3>French (Français)</h3>
 					<p>Using the <code>lang="fr"</code> attribute.</p>
 					<div class="code-demo-pair">
-						<pre><code>&lt;pull-to-refresh lang="fr"&gt;
+						<pre><code><mark>&lt;pull-to-refresh lang="fr"&gt;</mark>
   &lt;div class="content"&gt;
     &lt;p&gt;Contenu en français&lt;/p&gt;
   &lt;/div&gt;
-&lt;/pull-to-refresh&gt;</code></pre>
+<mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
 						<div class="demo">
 							<iframe
 								src="french.html"
@@ -227,11 +263,11 @@
 					<h3>Japanese (日本語)</h3>
 					<p>Using the <code>lang="ja"</code> attribute.</p>
 					<div class="code-demo-pair">
-						<pre><code>&lt;pull-to-refresh lang="ja"&gt;
+						<pre><code><mark>&lt;pull-to-refresh lang="ja"&gt;</mark>
   &lt;div class="content"&gt;
     &lt;p&gt;日本語のコンテンツ&lt;/p&gt;
   &lt;/div&gt;
-&lt;/pull-to-refresh&gt;</code></pre>
+<mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
 						<div class="demo">
 							<iframe
 								src="japanese.html"
@@ -306,8 +342,11 @@
 						<code>disabled</code> - Disables pull-to-refresh
 						functionality
 					</li>
+					<li>
+						<code>disable-selection</code> - Prevents text selection
+						during pull gesture
+					</li>
 				</ul>
-
 				<h3>Events</h3>
 				<ul>
 					<li>
@@ -339,11 +378,11 @@
 					</li>
 					<li>
 						<code>--ptr-indicator-bg</code> - Indicator background
-						(default: transparent)
+						(default: ButtonFace)
 					</li>
 					<li>
 						<code>--ptr-indicator-color</code> - Indicator text
-						color (default: CanvasText)
+						color (default: ButtonText)
 					</li>
 					<li>
 						<code>--ptr-indicator-font-size</code> - Indicator font
