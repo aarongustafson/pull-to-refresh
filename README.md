@@ -285,13 +285,10 @@ The component includes built-in translations for **16 languages**:
 
 The component uses a cascading fallback approach:
 
-```javascript
-// Priority order:
-1. Element's lang attribute: <pull-to-refresh lang="es">
-2. Nearest ancestor with lang: <div lang="fr"><pull-to-refresh>
-3. Document language: <html lang="de">
+1. Element's `lang` attribute: `&lt;pull-to-refresh lang="es"&gt;`
+2. Nearest ancestor with `lang`: `&lt;div lang="fr"&gt;&lt;pull-to-refresh&gt;`
+3. Document language: `&lt;html lang="de"&gt;`
 4. Default: English (en)
-```
 
 Regional variants (e.g., `en-US`, `es-MX`, `fr-CA`) automatically fall back to their base language.
 
