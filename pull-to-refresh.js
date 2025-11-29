@@ -50,6 +50,58 @@ export class PullToRefreshElement extends HTMLElement {
 		];
 	}
 
+	static styles = `
+		:host {
+			display: block;
+			position: relative;
+			height: 100vh;
+			overflow: hidden;
+		}
+
+		:host([pulling][disable-selection]) ::slotted(*) {
+			user-select: none;
+			-webkit-user-select: none;
+		}
+
+		.ptr-container {
+			height: 100%;
+			overflow-y: auto;
+			-webkit-overflow-scrolling: touch;
+			position: relative;
+		}
+
+		.ptr-indicator {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: var(--ptr-indicator-height, 3.125rem);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: var(--ptr-indicator-bg, ButtonFace);
+			color: var(--ptr-indicator-color, ButtonText);
+			font-size: var(--ptr-indicator-font-size, 0.875rem);
+			transform: translateY(-3.125rem);
+			transition: transform var(--ptr-transition-duration, 0.2s) ease;
+			z-index: 1000;
+			user-select: none;
+			-webkit-user-select: none;
+		}
+
+		.ptr-indicator.active {
+			/* Active state can be styled via CSS parts or custom properties */
+		}
+
+		.ptr-content {
+			position: relative;
+		}
+
+		:host([disabled]) .ptr-container {
+			touch-action: auto;
+		}
+	`;
+
 	constructor() {
 		super();
 		this.attachShadow({ mode: 'open' });
@@ -60,6 +112,10 @@ export class PullToRefreshElement extends HTMLElement {
 		this.isPulling = false;
 		this.isPullingConfirmed = false;
 		this.isRefreshing = false;
+
+		// Cached DOM references (set after render)
+		this._container = null;
+		this._indicator = null;
 
 		// Language detection
 		this.__lang =
@@ -137,10 +193,9 @@ export class PullToRefreshElement extends HTMLElement {
 		this.removeEventListener('pointerup', this.handleEnd);
 		this.removeEventListener('pointercancel', this.handleEnd);
 
-		const container = this.shadowRoot.querySelector('.ptr-container');
-		if (!container) return;
+		if (!this._container) return;
 
-		container.removeEventListener('scroll', this.handleScroll);
+		this._container.removeEventListener('scroll', this.handleScroll);
 	}
 
 	handleStart(e) {
@@ -151,15 +206,14 @@ export class PullToRefreshElement extends HTMLElement {
 			clientY: e.clientY,
 			target: e.target,
 		});
-		const container = this.shadowRoot.querySelector('.ptr-container');
-		if (container.scrollTop === 0 && !this.isRefreshing && !this.disabled) {
+		if (this._container.scrollTop === 0 && !this.isRefreshing && !this.disabled) {
 			console.log('[PTR] Starting pull (pending direction confirmation)');
 			this.isPulling = true;
 			this.isPullingConfirmed = false;
 			this.startY = e.clientY;
 		} else {
 			console.log('[PTR] Not starting pull', {
-				scrollTop: container.scrollTop,
+				scrollTop: this._container.scrollTop,
 				isRefreshing: this.isRefreshing,
 				disabled: this.disabled,
 			});
@@ -210,27 +264,25 @@ export class PullToRefreshElement extends HTMLElement {
 			}
 		}
 
-		const container = this.shadowRoot.querySelector('.ptr-container');
 		this.currentY = deltaY;
 
 		if (this.currentY > 0) {
 			e.preventDefault(); // Prevent scroll bounce
 
-			const indicator = this.shadowRoot.querySelector('.ptr-indicator');
 			const indicatorHeight = this.indicatorHeight;
 			const translateY = Math.min(
 				this.currentY - indicatorHeight,
 				indicatorHeight,
 			);
 
-			indicator.style.transform = `translateY(${translateY}px)`;
+			this._indicator.style.transform = `translateY(${translateY}px)`;
 
 			if (this.currentY > this.threshold) {
-				indicator.textContent = this.releaseText;
-				indicator.classList.add('active');
+				this._indicator.textContent = this.releaseText;
+				this._indicator.classList.add('active');
 			} else {
-				indicator.textContent = this.indicatorText;
-				indicator.classList.remove('active');
+				this._indicator.textContent = this.indicatorText;
+				this._indicator.classList.remove('active');
 			}
 
 			this.dispatchEvent(
@@ -275,8 +327,7 @@ export class PullToRefreshElement extends HTMLElement {
 	}
 
 	handleScroll() {
-		const container = this.shadowRoot.querySelector('.ptr-container');
-		if (container.scrollTop > 0 && !this.isRefreshing) {
+		if (this._container.scrollTop > 0 && !this.isRefreshing) {
 			this.resetIndicator();
 		}
 	}
@@ -284,9 +335,8 @@ export class PullToRefreshElement extends HTMLElement {
 	async triggerRefresh() {
 		console.log('[PTR] triggerRefresh called');
 		this.isRefreshing = true;
-		const indicator = this.shadowRoot.querySelector('.ptr-indicator');
-		indicator.textContent = this.refreshingText;
-		indicator.classList.add('active');
+		this._indicator.textContent = this.refreshingText;
+		this._indicator.classList.add('active');
 
 		const refreshEvent = new CustomEvent('ptr:refresh', {
 			bubbles: true,
@@ -319,28 +369,26 @@ export class PullToRefreshElement extends HTMLElement {
 	}
 
 	resetIndicator() {
-		const indicator = this.shadowRoot.querySelector('.ptr-indicator');
-		if (!indicator) return;
+		if (!this._indicator) return;
 
 		// Temporarily disable announcements during reset
-		indicator.setAttribute('aria-live', 'off');
+		this._indicator.setAttribute('aria-live', 'off');
 
-		indicator.style.transform = `translateY(${-this.indicatorHeight}px)`;
-		indicator.classList.remove('active');
-		indicator.textContent = this.indicatorText;
+		this._indicator.style.transform = `translateY(${-this.indicatorHeight}px)`;
+		this._indicator.classList.remove('active');
+		this._indicator.textContent = this.indicatorText;
 
 		// Re-enable announcements after text is updated
 		// Use setTimeout to ensure the text change happens first
 		setTimeout(() => {
-			indicator.setAttribute('aria-live', 'assertive');
+			this._indicator.setAttribute('aria-live', 'assertive');
 		}, 0);
 	}
 
 	updateIndicatorText() {
-		const indicator = this.shadowRoot.querySelector('.ptr-indicator');
-		if (!indicator || this.isPulling || this.isRefreshing) return;
+		if (!this._indicator || this.isPulling || this.isRefreshing) return;
 
-		indicator.textContent = this.indicatorText;
+		this._indicator.textContent = this.indicatorText;
 	}
 
 	get threshold() {
@@ -407,57 +455,61 @@ export class PullToRefreshElement extends HTMLElement {
 		return 50; // 3.125rem in pixels (assuming 16px base)
 	}
 
+	static styles = `
+		:host {
+			display: block;
+			position: relative;
+			height: 100vh;
+			overflow: hidden;
+		}
+
+		:host([pulling][disable-selection]) ::slotted(*) {
+			user-select: none;
+			-webkit-user-select: none;
+		}
+
+		.ptr-container {
+			height: 100%;
+			overflow-y: auto;
+			-webkit-overflow-scrolling: touch;
+			position: relative;
+		}
+
+		.ptr-indicator {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: var(--ptr-indicator-height, 3.125rem);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: var(--ptr-indicator-bg, ButtonFace);
+			color: var(--ptr-indicator-color, ButtonText);
+			font-size: var(--ptr-indicator-font-size, 0.875rem);
+			transform: translateY(-3.125rem);
+			transition: transform var(--ptr-transition-duration, 0.2s) ease;
+			z-index: 1000;
+			user-select: none;
+			-webkit-user-select: none;
+		}
+
+		.ptr-indicator.active {
+			/* Active state can be styled via CSS parts or custom properties */
+		}
+
+		.ptr-content {
+			position: relative;
+		}
+
+		:host([disabled]) .ptr-container {
+			touch-action: auto;
+		}
+	`;
+
 	render() {
 		this.shadowRoot.innerHTML = `
-			<style>
-			:host {
-				display: block;
-				position: relative;
-				height: 100vh;
-				overflow: hidden;
-			}
-
-			:host([pulling][disable-selection]) ::slotted(*) {
-				user-select: none;
-				-webkit-user-select: none;
-			}				.ptr-container {
-					height: 100%;
-					overflow-y: auto;
-					-webkit-overflow-scrolling: touch;
-					position: relative;
-				}
-
-				.ptr-indicator {
-					position: absolute;
-					top: 0;
-					left: 0;
-					right: 0;
-					height: var(--ptr-indicator-height, 3.125rem);
-					display: flex;
-					align-items: center;
-					justify-content: center;
-					background: var(--ptr-indicator-bg, ButtonFace);
-					color: var(--ptr-indicator-color, ButtonText);
-					font-size: var(--ptr-indicator-font-size, 0.875rem);
-					transform: translateY(-3.125rem);
-					transition: transform var(--ptr-transition-duration, 0.2s) ease;
-					z-index: 1000;
-					user-select: none;
-					-webkit-user-select: none;
-				}
-
-				.ptr-indicator.active {
-					/* Active state can be styled via CSS parts or custom properties */
-				}
-
-				.ptr-content {
-					position: relative;
-				}
-
-				:host([disabled]) .ptr-container {
-					touch-action: auto;
-				}
-			</style>
+			<style>${PullToRefreshElement.styles}</style>
 			<div class="ptr-container">
 				<div class="ptr-indicator" role="status" aria-live="assertive">
 					<slot name="indicator">${this.indicatorText}</slot>
@@ -467,5 +519,9 @@ export class PullToRefreshElement extends HTMLElement {
 				</div>
 			</div>
 		`;
+
+		// Cache DOM references for efficiency
+		this._container = this.shadowRoot.querySelector('.ptr-container');
+		this._indicator = this.shadowRoot.querySelector('.ptr-indicator');
 	}
 }
