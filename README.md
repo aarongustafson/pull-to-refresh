@@ -392,4 +392,4 @@ Created by [Aaron Gustafson](https://github.com/aarongustafson)
 
 ---
 
-**Try it out!** Check out the [live demo](demo/index.html) 🚀
+**Try it out!** Check out the [live demo](https://aarongustafson.github.io/pull-to-refresh/demo/index.html) 🚀
