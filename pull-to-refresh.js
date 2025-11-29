@@ -11,6 +11,7 @@ import defaultTranslations from './translations.json' with { type: 'json' };
  * @attr {string} refreshing-text - Text shown while refreshing (default: localized "⏳ Refreshing...")
  * @attr {string} lang - Language code for localization (falls back to closest [lang], document lang, or 'en')
  * @attr {boolean} disabled - Disables the pull-to-refresh functionality
+ * @attr {boolean} disable-selection - Disables text selection during pull gesture
  *
  * @fires ptr:pull-start - Fired when pull gesture starts
  * @fires ptr:pull-move - Fired during pull gesture, contains { distance } in detail
@@ -22,8 +23,8 @@ import defaultTranslations from './translations.json' with { type: 'json' };
  * @slot indicator - Optional custom indicator element
  *
  * @cssprop --ptr-indicator-height - Height of the indicator area (default: 3.125rem)
- * @cssprop --ptr-indicator-bg - Background color of the indicator (default: transparent)
- * @cssprop --ptr-indicator-color - Text color of the indicator (default: CanvasText)
+ * @cssprop --ptr-indicator-bg - Background color of the indicator (default: ButtonFace)
+ * @cssprop --ptr-indicator-color - Text color of the indicator (default: ButtonText)
  * @cssprop --ptr-indicator-font-size - Font size of the indicator text (default: 0.875rem)
  * @cssprop --ptr-transition-duration - Duration of indicator transitions (default: 0.2s)
  */
@@ -45,6 +46,7 @@ export class PullToRefreshElement extends HTMLElement {
 			'refreshing-text',
 			'lang',
 			'disabled',
+			'disable-selection',
 		];
 	}
 
@@ -56,6 +58,7 @@ export class PullToRefreshElement extends HTMLElement {
 		this.startY = 0;
 		this.currentY = 0;
 		this.isPulling = false;
+		this.isPullingConfirmed = false;
 		this.isRefreshing = false;
 
 		// Language detection
@@ -113,54 +116,102 @@ export class PullToRefreshElement extends HTMLElement {
 	setupEventListeners() {
 		if (this.disabled) return;
 
-		const container = this.shadowRoot.querySelector('.ptr-container');
-		if (!container) return;
-
-		container.addEventListener('pointerdown', this.handleStart, {
+		this.addEventListener('pointerdown', this.handleStart, {
 			passive: true,
 		});
-		container.addEventListener('pointermove', this.handleMove, {
+		this.addEventListener('pointermove', this.handleMove, {
 			passive: false,
 		});
-		container.addEventListener('pointerup', this.handleEnd);
-		container.addEventListener('pointercancel', this.handleEnd);
-		container.addEventListener('scroll', this.handleScroll);
+		this.addEventListener('pointerup', this.handleEnd);
+		this.addEventListener('pointercancel', this.handleEnd);
+
+		const container = this.shadowRoot.querySelector('.ptr-container');
+		if (container) {
+			container.addEventListener('scroll', this.handleScroll);
+		}
 	}
 
 	removeEventListeners() {
+		this.removeEventListener('pointerdown', this.handleStart);
+		this.removeEventListener('pointermove', this.handleMove);
+		this.removeEventListener('pointerup', this.handleEnd);
+		this.removeEventListener('pointercancel', this.handleEnd);
+
 		const container = this.shadowRoot.querySelector('.ptr-container');
 		if (!container) return;
 
-		container.removeEventListener('pointerdown', this.handleStart);
-		container.removeEventListener('pointermove', this.handleMove);
-		container.removeEventListener('pointerup', this.handleEnd);
-		container.removeEventListener('pointercancel', this.handleEnd);
 		container.removeEventListener('scroll', this.handleScroll);
 	}
 
 	handleStart(e) {
+		console.log('[PTR] handleStart', {
+			type: e.type,
+			pointerId: e.pointerId,
+			pointerType: e.pointerType,
+			clientY: e.clientY,
+			target: e.target,
+		});
 		const container = this.shadowRoot.querySelector('.ptr-container');
 		if (container.scrollTop === 0 && !this.isRefreshing && !this.disabled) {
+			console.log('[PTR] Starting pull (pending direction confirmation)');
 			this.isPulling = true;
+			this.isPullingConfirmed = false;
 			this.startY = e.clientY;
-
-			// Prevent text selection during pull
-			container.classList.add('pulling');
-
-			this.dispatchEvent(
-				new CustomEvent('ptr:pull-start', {
-					bubbles: true,
-					composed: true,
-				}),
-			);
+		} else {
+			console.log('[PTR] Not starting pull', {
+				scrollTop: container.scrollTop,
+				isRefreshing: this.isRefreshing,
+				disabled: this.disabled,
+			});
 		}
 	}
 
 	handleMove(e) {
 		if (!this.isPulling) return;
 
+		const deltaY = e.clientY - this.startY;
+
+		console.log('[PTR] handleMove', {
+			clientY: e.clientY,
+			startY: this.startY,
+			delta: deltaY,
+			isPullingConfirmed: this.isPullingConfirmed,
+		});
+
+		// If direction not yet confirmed, check if user is pulling down
+		if (!this.isPullingConfirmed) {
+			// Need some movement to determine direction (at least 5px)
+			if (Math.abs(deltaY) > 5) {
+				if (deltaY < 0) {
+					// Upward pull - cancel the gesture
+					console.log('[PTR] Upward pull detected, canceling');
+					this.isPulling = false;
+					return;
+				} else {
+					// Downward pull - confirm and proceed
+					console.log('[PTR] Downward pull confirmed');
+					this.isPullingConfirmed = true;
+
+					// Prevent text selection during pull if disable-selection is set
+					if (this.disableSelection) {
+						this.setAttribute('pulling', '');
+					}
+
+					this.dispatchEvent(
+						new CustomEvent('ptr:pull-start', {
+							bubbles: true,
+							composed: true,
+						}),
+					);
+				}
+			} else {
+				// Not enough movement yet
+				return;
+			}
+		}
+
 		const container = this.shadowRoot.querySelector('.ptr-container');
-		this.currentY = e.clientY - this.startY;
+		this.currentY = deltaY;
 
 		if (this.currentY > 0) {
 			e.preventDefault(); // Prevent scroll bounce
@@ -193,15 +244,17 @@ export class PullToRefreshElement extends HTMLElement {
 	}
 
 	handleEnd() {
+		console.log('[PTR] handleEnd', {
+			isPulling: this.isPulling,
+			currentY: this.currentY,
+			threshold: this.threshold,
+		});
 		if (!this.isPulling) return;
 
 		this.isPulling = false;
 
-		// Re-enable text selection
-		const container = this.shadowRoot.querySelector('.ptr-container');
-		if (container) {
-			container.classList.remove('pulling');
-		}
+		// Re-enable text selection if it was disabled
+		this.removeAttribute('pulling');
 
 		this.dispatchEvent(
 			new CustomEvent('ptr:pull-end', {
@@ -210,11 +263,15 @@ export class PullToRefreshElement extends HTMLElement {
 			}),
 		);
 
-		if (this.currentY > this.threshold) {
+		// Only trigger refresh if pulled down (positive currentY) past threshold
+		if (this.currentY > 0 && this.currentY > this.threshold) {
 			this.triggerRefresh();
 		} else {
 			this.resetIndicator();
 		}
+
+		// Reset currentY after handling the gesture
+		this.currentY = 0;
 	}
 
 	handleScroll() {
@@ -225,6 +282,7 @@ export class PullToRefreshElement extends HTMLElement {
 	}
 
 	async triggerRefresh() {
+		console.log('[PTR] triggerRefresh called');
 		this.isRefreshing = true;
 		const indicator = this.shadowRoot.querySelector('.ptr-indicator');
 		indicator.textContent = this.refreshingText;
@@ -323,6 +381,18 @@ export class PullToRefreshElement extends HTMLElement {
 		}
 	}
 
+	get disableSelection() {
+		return this.hasAttribute('disable-selection');
+	}
+
+	set disableSelection(value) {
+		if (value) {
+			this.setAttribute('disable-selection', '');
+		} else {
+			this.removeAttribute('disable-selection');
+		}
+	}
+
 	// eslint-disable-next-line class-methods-use-this
 	get indicatorHeight() {
 		return 50; // 3.125rem in pixels (assuming 16px base)
@@ -331,23 +401,21 @@ export class PullToRefreshElement extends HTMLElement {
 	render() {
 		this.shadowRoot.innerHTML = `
 			<style>
-				:host {
-					display: block;
-					position: relative;
-					height: 100vh;
-					overflow: hidden;
-				}
+			:host {
+				display: block;
+				position: relative;
+				height: 100vh;
+				overflow: hidden;
+			}
 
-				.ptr-container {
+			:host([pulling][disable-selection]) ::slotted(*) {
+				user-select: none;
+				-webkit-user-select: none;
+			}				.ptr-container {
 					height: 100%;
 					overflow-y: auto;
 					-webkit-overflow-scrolling: touch;
 					position: relative;
-				}
-
-				.ptr-container.pulling {
-					user-select: none;
-					-webkit-user-select: none;
 				}
 
 				.ptr-indicator {
@@ -357,11 +425,11 @@ export class PullToRefreshElement extends HTMLElement {
 					right: 0;
 					height: var(--ptr-indicator-height, 3.125rem);
 					display: flex;
-				align-items: center;
-				justify-content: center;
-				background: var(--ptr-indicator-bg, transparent);
-				color: var(--ptr-indicator-color, CanvasText);
-				font-size: var(--ptr-indicator-font-size, 0.875rem);
+					align-items: center;
+					justify-content: center;
+					background: var(--ptr-indicator-bg, ButtonFace);
+					color: var(--ptr-indicator-color, ButtonText);
+					font-size: var(--ptr-indicator-font-size, 0.875rem);
 					transform: translateY(-3.125rem);
 					transition: transform var(--ptr-transition-duration, 0.2s) ease;
 					z-index: 1000;
