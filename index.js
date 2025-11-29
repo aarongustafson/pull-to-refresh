@@ -1,2 +1,2 @@
-export { ComponentNameElement } from './COMPONENT-NAME.js';
+export { PullToRefreshElement } from './pull-to-refresh.js';
 import './define.js';

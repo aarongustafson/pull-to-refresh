@@ -3,19 +3,68 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>&lt;COMPONENT-NAME&gt; Web Component Demo</title>
+		<title>&lt;pull-to-refresh&gt; Web Component Demo</title>
 		<link rel="stylesheet" href="./styles.css" />
 		<style>
 			/* Demo-specific styles */
+			body {
+				margin: 0;
+				background: #f5f5f5;
+			}
+
+			.demo {
+				background: white;
+				border: 1px solid #ddd;
+				border-radius: 4px;
+				overflow: hidden;
+			}
+
+			.demo pull-to-refresh {
+				height: 300px;
+			}
+
+			.demo-content {
+				padding: 20px;
+			}
+
+			.demo-content h3 {
+				margin-top: 0;
+			}
+
+			.status {
+				background: #e3f2fd;
+				padding: 10px;
+				margin: 10px 0;
+				border-radius: 4px;
+				font-family: monospace;
+				font-size: 12px;
+			}
+
+			.random-number {
+				font-weight: bold;
+				color: #1976d2;
+			}
+
+			pull-to-refresh {
+				--ptr-indicator-bg: #f0f0f0;
+				--ptr-indicator-color: #333;
+			}
+
+			.full-height-demo {
+				height: 100vh;
+				margin: 0;
+				padding: 0;
+			}
 		</style>
 	</head>
 	<body>
 		<header>
-			<h1>&lt;COMPONENT-NAME&gt;</h1>
+			<h1>&lt;pull-to-refresh&gt;</h1>
 			<p>
-				COMPONENT_DESCRIPTION See the
+				Refreshes the current document or runs a specific JavaScript
+				function when pulling down on the page. See the
 				<a
-					href="https://github.com/aarongustafson/COMPONENT-NAME/blob/main/README.md"
+					href="https://github.com/aarongustafson/pull-to-refresh/blob/main/README.md"
 					>README</a
 				>
 				for installation and API documentation.
@@ -26,53 +75,318 @@
 			<!-- Basic Example -->
 			<section>
 				<h2>Basic Example</h2>
-				<p>A simple demonstration of the component.</p>
+				<p>
+					Pull down from the top to trigger a refresh. The random
+					number will update.
+				</p>
 
 				<div class="demo-section">
 					<h3>Basic Usage</h3>
-					<p>Description of this example.</p>
+					<p>
+						The component listens for pull gestures and fires a
+						<code>ptr:refresh</code> event.
+					</p>
 					<div class="code-demo-pair">
-						<pre><code>&lt;COMPONENT-NAME&gt;
-  &lt;p&gt;Content goes here&lt;/p&gt;
-&lt;/COMPONENT-NAME&gt;</code></pre>
+						<pre><code>&lt;pull-to-refresh&gt;
+  &lt;div class="content"&gt;
+    &lt;h3&gt;My Content&lt;/h3&gt;
+    &lt;p&gt;Pull down to refresh&lt;/p&gt;
+    &lt;p&gt;Random: &lt;span id="random1"&gt;0&lt;/span&gt;&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/pull-to-refresh&gt;</code></pre>
 						<div class="demo">
-							<COMPONENT-NAME>
-								<p>Content goes here</p>
-							</COMPONENT-NAME>
+							<pull-to-refresh id="demo1">
+								<div class="demo-content">
+									<h3>My Content</h3>
+									<p>
+										Scroll down and pull from the top to
+										refresh.
+									</p>
+									<p>
+										Random number:
+										<span class="random-number" id="random1"
+											>0</span
+										>
+									</p>
+									<div class="status" id="status1">Ready</div>
+								</div>
+							</pull-to-refresh>
 						</div>
 					</div>
 				</div>
 			</section>
 
-			<!-- Example with Attributes -->
+			<!-- Custom Threshold Example -->
 			<section>
-				<h2>Example with Attributes</h2>
-				<p>Demonstrating component attributes.</p>
+				<h2>Custom Threshold</h2>
+				<p>
+					Demonstrating a custom threshold distance (120px instead of
+					default 80px).
+				</p>
 
 				<div class="demo-section">
-					<h3>Using Attributes</h3>
-					<p>Description of this example with attributes.</p>
+					<h3>Using threshold Attribute</h3>
+					<p>You need to pull further down to trigger the refresh.</p>
 					<div class="code-demo-pair">
-						<pre><code>&lt;COMPONENT-NAME example-attribute="value"&gt;
-  &lt;p&gt;Content with attributes&lt;/p&gt;
-&lt;/COMPONENT-NAME&gt;</code></pre>
+						<pre><code>&lt;pull-to-refresh threshold="120"&gt;
+  &lt;div class="content"&gt;
+    &lt;p&gt;Pull 120px to refresh&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/pull-to-refresh&gt;</code></pre>
 						<div class="demo">
-							<COMPONENT-NAME example-attribute="value">
-								<p>Content with attributes</p>
-							</COMPONENT-NAME>
+							<pull-to-refresh id="demo2" threshold="120">
+								<div class="demo-content">
+									<h3>Custom Threshold (120px)</h3>
+									<p>Pull down further to trigger refresh.</p>
+									<p>
+										Random number:
+										<span class="random-number" id="random2"
+											>0</span
+										>
+									</p>
+									<div class="status" id="status2">Ready</div>
+								</div>
+							</pull-to-refresh>
 						</div>
 					</div>
+				</div>
+			</section>
+
+			<!-- Custom Text Example -->
+			<section>
+				<h2>Custom Indicator Text</h2>
+				<p>Customize the text shown in the pull indicator.</p>
+
+				<div class="demo-section">
+					<h3>Custom Messages</h3>
+					<p>Using custom text for the indicator states.</p>
+					<div class="code-demo-pair">
+						<pre><code>&lt;pull-to-refresh
+  indicator-text="⬇ Swipe down"
+  release-text="🔄 Let go!"
+  refreshing-text="⏳ Loading..."&gt;
+  &lt;div class="content"&gt;
+    &lt;p&gt;Custom messages&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/pull-to-refresh&gt;</code></pre>
+						<div class="demo">
+							<pull-to-refresh
+								id="demo3"
+								indicator-text="⬇ Swipe down"
+								release-text="🔄 Let go!"
+								refreshing-text="⏳ Loading..."
+							>
+								<div class="demo-content">
+									<h3>Custom Messages</h3>
+									<p>Notice the different indicator text.</p>
+									<p>
+										Random number:
+										<span class="random-number" id="random3"
+											>0</span
+										>
+									</p>
+									<div class="status" id="status3">Ready</div>
+								</div>
+							</pull-to-refresh>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Localization Example -->
+			<section>
+				<h2>Localization (i18n)</h2>
+				<p>The component automatically detects language and uses appropriate translations for 16 languages.</p>
+
+				<div class="demo-section">
+					<h3>Spanish (Español)</h3>
+					<p>Using the <code>lang="es"</code> attribute.</p>
+					<div class="code-demo-pair">
+						<pre><code>&lt;pull-to-refresh lang="es"&gt;
+  &lt;div class="content"&gt;
+    &lt;p&gt;Contenido en español&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/pull-to-refresh&gt;</code></pre>
+						<div class="demo">
+							<pull-to-refresh id="demo4" lang="es">
+								<div class="demo-content">
+									<h3>Contenido en Español</h3>
+									<p>Los mensajes aparecen en español.</p>
+									<p>
+										Número aleatorio:
+										<span class="random-number" id="random4"
+											>0</span
+										>
+									</p>
+									<div class="status" id="status4">Listo</div>
+								</div>
+							</pull-to-refresh>
+						</div>
+					</div>
+				</div>
+
+				<div class="demo-section">
+					<h3>French (Français)</h3>
+					<p>Using the <code>lang="fr"</code> attribute.</p>
+					<div class="code-demo-pair">
+						<pre><code>&lt;pull-to-refresh lang="fr"&gt;
+  &lt;div class="content"&gt;
+    &lt;p&gt;Contenu en français&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/pull-to-refresh&gt;</code></pre>
+						<div class="demo">
+							<pull-to-refresh id="demo5" lang="fr">
+								<div class="demo-content">
+									<h3>Contenu en Français</h3>
+									<p>Les messages apparaissent en français.</p>
+									<p>
+										Numéro aléatoire:
+										<span class="random-number" id="random5"
+											>0</span
+										>
+									</p>
+									<div class="status" id="status5">Prêt</div>
+								</div>
+							</pull-to-refresh>
+						</div>
+					</div>
+				</div>
+
+				<div class="demo-section">
+					<h3>Japanese (日本語)</h3>
+					<p>Using the <code>lang="ja"</code> attribute.</p>
+					<div class="code-demo-pair">
+						<pre><code>&lt;pull-to-refresh lang="ja"&gt;
+  &lt;div class="content"&gt;
+    &lt;p&gt;日本語のコンテンツ&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/pull-to-refresh&gt;</code></pre>
+						<div class="demo">
+							<pull-to-refresh id="demo6" lang="ja">
+								<div class="demo-content">
+									<h3>日本語のコンテンツ</h3>
+									<p>メッセージが日本語で表示されます。</p>
+									<p>
+										ランダム番号:
+										<span class="random-number" id="random6"
+											>0</span
+										>
+									</p>
+									<div class="status" id="status6">準備完了</div>
+								</div>
+							</pull-to-refresh>
+						</div>
+					</div>
+				</div>
+
+				<div class="demo-section">
+					<h3>Supported Languages</h3>
+					<p>The component includes built-in translations for:</p>
+					<ul style="columns: 2; -webkit-columns: 2; -moz-columns: 2;">
+						<li>English (en)</li>
+						<li>Chinese/中文 (zh)</li>
+						<li>Hindi/हिन्दी (hi)</li>
+						<li>Spanish/Español (es)</li>
+						<li>French/Français (fr)</li>
+						<li>Arabic/العربية (ar)</li>
+						<li>Bengali/বাংলা (bn)</li>
+						<li>Portuguese/Português (pt)</li>
+						<li>Russian/Русский (ru)</li>
+						<li>Japanese/日本語 (ja)</li>
+						<li>German/Deutsch (de)</li>
+						<li>Punjabi/ਪੰਜਾਬੀ (pa)</li>
+						<li>Javanese (jv)</li>
+						<li>Korean/한국어 (ko)</li>
+						<li>Vietnamese/Tiếng Việt (vi)</li>
+						<li>Italian/Italiano (it)</li>
+					</ul>
+					<p>Regional variants (e.g., <code>en-US</code>, <code>es-MX</code>) automatically fall back to the base language.</p>
 				</div>
 			</section>
 
 			<!-- API Reference -->
 			<section class="api-reference">
 				<h2>API Reference</h2>
+
+				<h3>Attributes</h3>
+				<ul>
+					<li>
+						<code>threshold</code> - Distance in pixels to trigger
+						refresh (default: 80)
+					</li>
+					<li>
+						<code>indicator-text</code> - Text when pulling
+						(default: localized "↓ Pull to refresh")
+					</li>
+					<li>
+						<code>release-text</code> - Text when ready to release
+						(default: localized "↻ Release to refresh")
+					</li>
+					<li>
+						<code>refreshing-text</code> - Text while refreshing
+						(default: localized "⏳ Refreshing...")
+					</li>
+					<li>
+						<code>lang</code> - Language code for localization
+						(auto-detected from element, ancestor, or document)
+					</li>
+					<li>
+						<code>disabled</code> - Disables pull-to-refresh
+						functionality
+					</li>
+				</ul>
+
+				<h3>Events</h3>
+				<ul>
+					<li>
+						<code>ptr:pull-start</code> - Fired when pull gesture
+						starts
+					</li>
+					<li>
+						<code>ptr:pull-move</code> - Fired during pull (detail
+						contains distance)
+					</li>
+					<li>
+						<code>ptr:pull-end</code> - Fired when pull gesture ends
+					</li>
+					<li>
+						<code>ptr:refresh</code> - Fired when refresh is
+						triggered
+					</li>
+					<li>
+						<code>ptr:refresh-complete</code> - Fired when refresh
+						completes
+					</li>
+				</ul>
+
+				<h3>CSS Custom Properties</h3>
+				<ul>
+					<li>
+						<code>--ptr-indicator-height</code> - Height of
+						indicator (default: 50px)
+					</li>
+					<li>
+						<code>--ptr-indicator-bg</code> - Indicator background
+						(default: transparent)
+					</li>
+					<li>
+						<code>--ptr-indicator-color</code> - Indicator text
+						color (default: #555)
+					</li>
+					<li>
+						<code>--ptr-indicator-font-size</code> - Indicator font
+						size (default: 14px)
+					</li>
+					<li>
+						<code>--ptr-transition-duration</code> - Transition
+						duration (default: 0.2s)
+					</li>
+				</ul>
+
 				<p>
-					For complete documentation of attributes, events, and
-					browser support, see the
+					For complete documentation and browser support, see the
 					<a
-						href="https://github.com/aarongustafson/COMPONENT-NAME/blob/main/README.md"
+						href="https://github.com/aarongustafson/pull-to-refresh/blob/main/README.md"
 						>README</a
 					>.
 				</p>
@@ -84,12 +398,115 @@
 				Made with ❤️ by
 				<a href="https://github.com/aarongustafson">Aaron Gustafson</a>.
 				View the source on
-				<a href="https://github.com/aarongustafson/COMPONENT-NAME"
+				<a href="https://github.com/aarongustafson/pull-to-refresh"
 					>GitHub</a
 				>.
 			</p>
 		</footer>
 
 		<script src="../define.js" type="module"></script>
+		<script>
+			// Demo 1 - Basic
+			const demo1 = document.getElementById('demo1');
+			const random1 = document.getElementById('random1');
+			const status1 = document.getElementById('status1');
+
+			demo1.addEventListener('ptr:refresh', (e) => {
+				status1.textContent = 'Refreshing...';
+				setTimeout(() => {
+					random1.textContent = Math.floor(Math.random() * 1000);
+					e.detail.complete();
+				}, 1500);
+			});
+
+			demo1.addEventListener('ptr:refresh-complete', () => {
+				status1.textContent = 'Complete! Pull again to refresh.';
+			});
+
+			// Demo 2 - Custom threshold
+			const demo2 = document.getElementById('demo2');
+			const random2 = document.getElementById('random2');
+			const status2 = document.getElementById('status2');
+
+			demo2.addEventListener('ptr:refresh', (e) => {
+				status2.textContent = 'Refreshing...';
+				setTimeout(() => {
+					random2.textContent = Math.floor(Math.random() * 1000);
+					e.detail.complete();
+				}, 1500);
+			});
+
+			demo2.addEventListener('ptr:refresh-complete', () => {
+				status2.textContent = 'Complete! Pull again to refresh.';
+			});
+
+			// Demo 3 - Custom text
+			const demo3 = document.getElementById('demo3');
+			const random3 = document.getElementById('random3');
+			const status3 = document.getElementById('status3');
+
+			demo3.addEventListener('ptr:refresh', (e) => {
+				status3.textContent = 'Refreshing...';
+				setTimeout(() => {
+					random3.textContent = Math.floor(Math.random() * 1000);
+					e.detail.complete();
+				}, 1500);
+			});
+
+			demo3.addEventListener('ptr:refresh-complete', () => {
+				status3.textContent = 'Complete! Pull again to refresh.';
+			});
+
+			// Demo 4 - Spanish
+			const demo4 = document.getElementById('demo4');
+			const random4 = document.getElementById('random4');
+			const status4 = document.getElementById('status4');
+
+			demo4.addEventListener('ptr:refresh', (e) => {
+				status4.textContent = 'Actualizando...';
+				setTimeout(() => {
+					random4.textContent = Math.floor(Math.random() * 1000);
+					e.detail.complete();
+				}, 1500);
+			});
+
+			demo4.addEventListener('ptr:refresh-complete', () => {
+				status4.textContent = '¡Completo! Desliza de nuevo para actualizar.';
+			});
+
+			// Demo 5 - French
+			const demo5 = document.getElementById('demo5');
+			const random5 = document.getElementById('random5');
+			const status5 = document.getElementById('status5');
+
+			demo5.addEventListener('ptr:refresh', (e) => {
+				status5.textContent = 'Actualisation...';
+				setTimeout(() => {
+					random5.textContent = Math.floor(Math.random() * 1000);
+					e.detail.complete();
+				}, 1500);
+			});
+
+			demo5.addEventListener('ptr:refresh-complete', () => {
+				status5.textContent = 'Terminé! Tirez à nouveau pour actualiser.';
+			});
+
+			// Demo 6 - Japanese
+			const demo6 = document.getElementById('demo6');
+			const random6 = document.getElementById('random6');
+			const status6 = document.getElementById('status6');
+
+			demo6.addEventListener('ptr:refresh', (e) => {
+				status6.textContent = '更新中...';
+				setTimeout(() => {
+					random6.textContent = Math.floor(Math.random() * 1000);
+					e.detail.complete();
+				}, 1500);
+			});
+
+			demo6.addEventListener('ptr:refresh-complete', () => {
+				status6.textContent = '完了！もう一度引っ張って更新してください。';
+			});
+		</script>
 	</body>
 </html>

@@ -1,0 +1,82 @@
+{
+	"en": {
+		"indicator": "↓ Pull to refresh",
+		"release": "↻ Release to refresh",
+		"refreshing": "⏳ Refreshing..."
+	},
+	"zh": {
+		"indicator": "↓ 下拉刷新",
+		"release": "↻ 释放刷新",
+		"refreshing": "⏳ 刷新中..."
+	},
+	"hi": {
+		"indicator": "↓ रीफ्रेश करने के लिए खींचें",
+		"release": "↻ रीफ्रेश करने के लिए छोड़ें",
+		"refreshing": "⏳ रीफ्रेश हो रहा है..."
+	},
+	"es": {
+		"indicator": "↓ Desliza para actualizar",
+		"release": "↻ Suelta para actualizar",
+		"refreshing": "⏳ Actualizando..."
+	},
+	"fr": {
+		"indicator": "↓ Tirez pour actualiser",
+		"release": "↻ Relâchez pour actualiser",
+		"refreshing": "⏳ Actualisation..."
+	},
+	"ar": {
+		"indicator": "↓ اسحب للتحديث",
+		"release": "↻ حرر للتحديث",
+		"refreshing": "⏳ جارٍ التحديث..."
+	},
+	"bn": {
+		"indicator": "↓ রিফ্রেশ করতে টানুন",
+		"release": "↻ রিফ্রেশ করতে ছেড়ে দিন",
+		"refreshing": "⏳ রিফ্রেশ হচ্ছে..."
+	},
+	"pt": {
+		"indicator": "↓ Puxe para atualizar",
+		"release": "↻ Solte para atualizar",
+		"refreshing": "⏳ Atualizando..."
+	},
+	"ru": {
+		"indicator": "↓ Потяните для обновления",
+		"release": "↻ Отпустите для обновления",
+		"refreshing": "⏳ Обновление..."
+	},
+	"ja": {
+		"indicator": "↓ 引っ張って更新",
+		"release": "↻ 離して更新",
+		"refreshing": "⏳ 更新中..."
+	},
+	"de": {
+		"indicator": "↓ Zum Aktualisieren ziehen",
+		"release": "↻ Zum Aktualisieren loslassen",
+		"refreshing": "⏳ Wird aktualisiert..."
+	},
+	"pa": {
+		"indicator": "↓ ਤਾਜ਼ਾ ਕਰਨ ਲਈ ਖਿੱਚੋ",
+		"release": "↻ ਤਾਜ਼ਾ ਕਰਨ ਲਈ ਛੱਡੋ",
+		"refreshing": "⏳ ਤਾਜ਼ਾ ਹੋ ਰਿਹਾ ਹੈ..."
+	},
+	"jv": {
+		"indicator": "↓ Tarik kanggo nyegerake",
+		"release": "↻ Selehake kanggo nyegerake",
+		"refreshing": "⏳ Lagi nyegerake..."
+	},
+	"ko": {
+		"indicator": "↓ 당겨서 새로고침",
+		"release": "↻ 놓아서 새로고침",
+		"refreshing": "⏳ 새로고침 중..."
+	},
+	"vi": {
+		"indicator": "↓ Kéo để làm mới",
+		"release": "↻ Thả để làm mới",
+		"refreshing": "⏳ Đang làm mới..."
+	},
+	"it": {
+		"indicator": "↓ Trascina per aggiornare",
+		"release": "↻ Rilascia per aggiornare",
+		"refreshing": "⏳ Aggiornamento..."
+	}
+}

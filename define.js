@@ -1,3 +1,3 @@
-import { ComponentNameElement } from './COMPONENT-NAME.js';
+import { PullToRefreshElement } from './pull-to-refresh.js';
 
-customElements.define('COMPONENT-NAME', ComponentNameElement);
+customElements.define('pull-to-refresh', PullToRefreshElement);

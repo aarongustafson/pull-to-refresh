@@ -1,152 +1,354 @@
-# Web Component Starter Template
+# &lt;pull-to-refresh&gt;
 
-A comprehensive, production-ready starter template for creating Web Components. This template is based on the architecture and best practices from [form-obfuscator](https://github.com/aarongustafson/form-obfuscator).
+A lightweight, customizable Web Component that adds pull-to-refresh functionality to your web applications. Perfect for mobile-first experiences and progressive web apps.
 
 ## ✨ Features
 
-- **Modern Tooling**: Vitest, ESLint, Prettier, Happy DOM
-- **Best Practices**: Shadow DOM, Custom Elements v1, proper encapsulation
-- **Multiple Import Options**: Auto-define, manual definition, or both
-- **Testing**: Comprehensive test setup with coverage reporting
-- **CI/CD**: GitHub Actions workflows included
-- **Developer Experience**: Demo page, interactive setup, extensive documentation
-- **Publishing Ready**: npm package configuration and automated publishing workflow
+- **Touch-optimized**: Smooth pull gesture with momentum and feedback
+- **Customizable**: Adjust threshold, text, and styling via attributes and CSS custom properties
+- **Event-driven**: Rich event API for complete control over the refresh lifecycle
+- **Accessible**: Semantic HTML and ARIA-friendly
+- **Framework-agnostic**: Works with any framework or vanilla JavaScript
+- **Lightweight**: No dependencies, just native Web Components
+- **Shadow DOM**: Encapsulated styles that won't leak
 
 ## 🚀 Quick Start
 
-### Use This Template
-
-1. Click "Use this template" on GitHub, or:
+### Installation
 
 ```bash
-git clone https://github.com/aarongustafson/web-component-starter.git my-component
-cd my-component
+npm install @aarongustafson/pull-to-refresh
 ```
 
-2. Run the interactive setup:
-
-```bash
-npm install
-npm run setup
-```
-
-The setup wizard will:
-- Ask for your component name (e.g., `my-awesome-component`)
-- Ask for a description
-- Rename all files automatically
-- Replace all placeholders
-- **Clean up template setup files** (SETUP.md, scripts/)
-- Install dependencies
-- Initialize git repository
-
-### Manual Setup
-
-If you prefer manual setup, see [SETUP.md](SETUP.md) for detailed instructions.
-
-## 📁 What's Included
-
-```
-web-component-starter/
-├── COMPONENT-NAME.js          # Component implementation
-├── index.js                   # Main entry (class + auto-define)
-├── define.js                  # Auto-define only
-├── custom-elements.json       # Custom Elements Manifest
-├── package.json               # Package config with scripts
-├── LICENSE                    # MIT License
-├── .gitignore                 # Git ignore
-├── .npmignore                 # npm ignore
-├── .prettierrc                # Prettier config
-├── .editorconfig              # Editor config
-├── eslint.config.js           # ESLint config
-├── vitest.config.js           # Vitest config
-├── .github/
-│   ├── workflows/
-│   │   ├── ci.yml            # Continuous integration
-│   │   └── publish.yml       # Auto-publish to npm
-│   └── ISSUE_TEMPLATE/       # Bug & feature templates
-├── scripts/
-│   └── setup.js              # Interactive setup wizard (removed after setup)
-├── test/
-│   ├── setup.js              # Test configuration
-│   └── COMPONENT-NAME.test.js # Test suite
-├── demo/
-│   └── index.html            # Live demo page
-├── SETUP.md                  # Manual setup guide
-└── CONTRIBUTING.md           # Contribution guidelines
-```
-
-## 🛠️ Development
-
-### Available Scripts
-
-```bash
-npm run setup          # Interactive setup wizard
-npm test               # Run tests in watch mode
-npm run test:run       # Run tests once
-npm run test:ui        # Open Vitest UI
-npm run test:coverage  # Generate coverage report
-npm run lint           # Lint with ESLint + Prettier
-npm run format         # Auto-fix linting issues
-```
-
-### Component Architecture
-
-This template provides three flexible import options:
+### Usage
 
 **Option 1: Auto-define (easiest)**
 ```javascript
-import '@yourscope/component-name';
-// Element is automatically registered
+import '@aarongustafson/pull-to-refresh';
 ```
 
 **Option 2: Manual registration**
 ```javascript
-import { ComponentNameElement } from '@yourscope/component-name/component-name.js';
-customElements.define('my-custom-name', ComponentNameElement);
+import { PullToRefreshElement } from '@aarongustafson/pull-to-refresh/pull-to-refresh.js';
+customElements.define('pull-to-refresh', PullToRefreshElement);
 ```
 
-**Option 3: Both**
+**Option 3: Both (class + auto-define)**
 ```javascript
-import { ComponentNameElement } from '@yourscope/component-name';
-// Element is registered AND class is available for extension
+import { PullToRefreshElement } from '@aarongustafson/pull-to-refresh';
+// Element is registered AND class is available
 ```
 
-## 🧪 Testing
+### Basic Example
 
-Includes:
-- **Vitest**: Fast, modern test runner
-- **Happy DOM**: Lightweight browser environment
-- **Testing Library**: DOM testing utilities
-- **Coverage**: V8 coverage reporting
-- **UI**: Interactive test debugging
+```html
+<pull-to-refresh>
+  <div class="content">
+    <h1>My Content</h1>
+    <p>Pull down from the top to refresh!</p>
+  </div>
+</pull-to-refresh>
 
-Example:
+<script type="module">
+  import '@aarongustafson/pull-to-refresh';
+
+  const ptr = document.querySelector('pull-to-refresh');
+
+  ptr.addEventListener('ptr:refresh', (e) => {
+    // Perform your refresh logic (fetch data, etc.)
+    fetch('/api/data')
+      .then(response => response.json())
+      .then(data => {
+        // Update your content
+        updateContent(data);
+        // Signal completion
+        e.detail.complete();
+      });
+  });
+</script>
+```
+
+## 📖 API
+
+### Attributes
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `threshold` | number | `80` | Distance in pixels to trigger refresh |
+| `indicator-text` | string | localized | Text shown when pulling down |
+| `release-text` | string | localized | Text shown when ready to release |
+| `refreshing-text` | string | localized | Text shown while refreshing |
+| `lang` | string | auto-detected | Language code for localization |
+| `disabled` | boolean | `false` | Disables pull-to-refresh functionality |
+
+**Note:** The text attributes use automatic localization based on the `lang` attribute or auto-detection. See [Localization](#-localization-i18n) below.
+
+### Properties
+
+All attributes are also available as properties:
+
 ```javascript
-import { describe, it, expect } from 'vitest';
+const ptr = document.querySelector('pull-to-refresh');
+ptr.threshold = 120;
+ptr.indicatorText = 'Swipe down';
+ptr.disabled = true;
+```
 
-describe('MyComponent', () => {
-  it('should render', () => {
-    const el = document.createElement('my-component');
-    expect(el).toBeInstanceOf(HTMLElement);
+### Events
+
+| Event | Detail | Description |
+|-------|--------|-------------|
+| `ptr:pull-start` | `{}` | Fired when pull gesture starts |
+| `ptr:pull-move` | `{ distance: number }` | Fired during pull gesture |
+| `ptr:pull-end` | `{}` | Fired when pull gesture ends |
+| `ptr:refresh` | `{ complete: Function }` | Fired when refresh is triggered |
+| `ptr:refresh-complete` | `{}` | Fired when refresh completes |
+
+**Important**: Call `event.detail.complete()` in your `ptr:refresh` handler to signal completion:
+
+```javascript
+ptr.addEventListener('ptr:refresh', (e) => {
+  doAsyncWork().then(() => {
+    e.detail.complete(); // Call this when done
   });
 });
 ```
 
-## 📦 Publishing
+If you don't call `complete()`, the component will auto-complete after 2 seconds.
 
-### Setup npm Publishing
+### Slots
 
-1. Add `NPM_TOKEN` to GitHub repository secrets
-2. Update version in `package.json`
-3. Create a GitHub release
-4. Automated workflow publishes to npm
+| Slot | Description |
+|------|-------------|
+| (default) | Your scrollable content |
+| `indicator` | Optional custom indicator element |
 
-### Manual Publishing
+### CSS Custom Properties
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| `--ptr-indicator-height` | `50px` | Height of the indicator area |
+| `--ptr-indicator-bg` | `transparent` | Background color of indicator |
+| `--ptr-indicator-color` | `#555` | Text color of indicator |
+| `--ptr-indicator-font-size` | `14px` | Font size of indicator text |
+| `--ptr-transition-duration` | `0.2s` | Duration of indicator transitions |
+
+### Methods
+
+| Method | Description |
+|--------|-------------|
+| `completeRefresh()` | Manually complete the refresh (alternative to calling `event.detail.complete()`) |
+
+## 🎨 Examples
+
+### Custom Threshold
+
+```html
+<pull-to-refresh threshold="120">
+  <div>Content here</div>
+</pull-to-refresh>
+```
+
+### Localization
+
+The component automatically detects the language and displays localized text:
+
+```html
+<!-- Spanish -->
+<pull-to-refresh lang="es">
+  <div>Contenido aquí</div>
+</pull-to-refresh>
+
+<!-- French -->
+<pull-to-refresh lang="fr">
+  <div>Contenu ici</div>
+</pull-to-refresh>
+
+<!-- Japanese -->
+<pull-to-refresh lang="ja">
+  <div>ここにコンテンツ</div>
+</pull-to-refresh>
+```
+
+The component supports 16 languages with automatic fallback to English. Language is detected from:
+1. The element's `lang` attribute
+2. The nearest ancestor's `lang` attribute
+3. The document's `lang` attribute
+4. Default: English
+
+You can also register custom translations:
+
+```javascript
+import { PullToRefreshElement } from '@aarongustafson/pull-to-refresh';
+
+PullToRefreshElement.registerTranslations({
+  'pt-BR': {
+    indicator: '↓ Puxe para atualizar',
+    release: '↻ Solte para atualizar',
+    refreshing: '⏳ Atualizando...'
+  }
+});
+```
+
+### Custom Styling
+
+```html
+<style>
+  pull-to-refresh {
+    --ptr-indicator-bg: #f0f0f0;
+    --ptr-indicator-color: #1976d2;
+    --ptr-indicator-font-size: 16px;
+    --ptr-indicator-height: 60px;
+  }
+</style>
+
+<pull-to-refresh>
+  <div>Content here</div>
+</pull-to-refresh>
+```
+
+### Custom Messages
+
+```html
+<pull-to-refresh
+  indicator-text="⬇ Swipe down"
+  release-text="🔄 Let go!"
+  refreshing-text="⏳ Loading...">
+  <div>Content here</div>
+</pull-to-refresh>
+```
+
+### With Fetch API
+
+```javascript
+ptr.addEventListener('ptr:refresh', async (e) => {
+  try {
+    const response = await fetch('/api/latest');
+    const data = await response.json();
+    renderData(data);
+  } catch (error) {
+    console.error('Refresh failed:', error);
+  } finally {
+    e.detail.complete();
+  }
+});
+```
+
+### Disabled State
+
+```html
+<!-- Disable pull-to-refresh when needed -->
+<pull-to-refresh disabled>
+  <div>No refresh available</div>
+</pull-to-refresh>
+
+<script>
+  // Or toggle programmatically
+  ptr.disabled = true;
+</script>
+```
+
+### Tracking Pull Distance
+
+```javascript
+ptr.addEventListener('ptr:pull-move', (e) => {
+  console.log('Pull distance:', e.detail.distance);
+  // Use this for custom animations, etc.
+});
+```
+
+## 🌍 Localization (i18n)
+
+The component includes built-in translations for **16 languages**:
+
+| Language | Code | Indicator Text |
+|----------|------|----------------|
+| English | `en` | ↓ Pull to refresh |
+| Chinese (Mandarin) | `zh` | ↓ 下拉刷新 |
+| Hindi | `hi` | ↓ रीफ्रेश करने के लिए खींचें |
+| Spanish | `es` | ↓ Desliza para actualizar |
+| French | `fr` | ↓ Tirez pour actualiser |
+| Arabic | `ar` | ↓ اسحب للتحديث |
+| Bengali | `bn` | ↓ রিফ্রেশ করতে টানুন |
+| Portuguese | `pt` | ↓ Puxe para atualizar |
+| Russian | `ru` | ↓ Потяните для обновления |
+| Japanese | `ja` | ↓ 引っ張って更新 |
+| German | `de` | ↓ Zum Aktualisieren ziehen |
+| Punjabi | `pa` | ↓ ਤਾਜ਼ਾ ਕਰਨ ਲਈ ਖਿੱਚੋ |
+| Javanese | `jv` | ↓ Tarik kanggo nyegerake |
+| Korean | `ko` | ↓ 당겨서 새로고침 |
+| Vietnamese | `vi` | ↓ Kéo để làm mới |
+| Italian | `it` | ↓ Trascina per aggiornare |
+
+### Language Detection
+
+The component uses a cascading fallback approach:
+
+```javascript
+// Priority order:
+1. Element's lang attribute: <pull-to-refresh lang="es">
+2. Nearest ancestor with lang: <div lang="fr"><pull-to-refresh>
+3. Document language: <html lang="de">
+4. Default: English (en)
+```
+
+Regional variants (e.g., `en-US`, `es-MX`, `fr-CA`) automatically fall back to their base language.
+
+### Custom Translations
+
+Register custom translations or override existing ones:
+
+```javascript
+import { PullToRefreshElement } from '@aarongustafson/pull-to-refresh';
+
+// Add a new language
+PullToRefreshElement.registerTranslations({
+  'nl': {
+    indicator: '↓ Trek om te vernieuwen',
+    release: '↻ Loslaten om te vernieuwen',
+    refreshing: '⏳ Vernieuwen...'
+  }
+});
+
+// Override existing translations
+PullToRefreshElement.registerTranslations({
+  'en': {
+    indicator: '⬇ Pull down',
+    release: '🔄 Let go',
+    refreshing: '⏳ Loading...'
+  }
+});
+```
+
+### Per-Instance Overrides
+
+You can always override translations for individual instances:
+
+```html
+<pull-to-refresh 
+  lang="es"
+  indicator-text="Custom Spanish text"
+  release-text="Custom release text">
+  <!-- Content -->
+</pull-to-refresh>
+```
+
+## 🧪 Testing
 
 ```bash
-npm run test:run  # Ensure tests pass
-npm run lint      # Ensure code is clean
-npm publish       # Publish to npm
+npm test               # Run tests in watch mode
+npm run test:run       # Run tests once
+npm run test:ui        # Open Vitest UI
+npm run test:coverage  # Generate coverage report
+```
+
+## 🛠️ Development
+
+```bash
+npm install            # Install dependencies
+npm run setup          # Run setup wizard (first time)
+npm run lint           # Lint code
+npm run format         # Format code
 ```
 
 ## 🌐 Browser Support
@@ -155,38 +357,38 @@ Works in all modern browsers supporting:
 - Custom Elements v1
 - Shadow DOM v1
 - ES Modules
+- Pointer Events
 
-For legacy browsers, use polyfills.
+For legacy browsers, use appropriate polyfills.
 
-## 📚 Documentation
+## 📦 Package Exports
 
-- [SETUP.md](SETUP.md) - Detailed setup instructions (removed after setup)
-- [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
-- [LICENSE](LICENSE) - MIT License
+```javascript
+// Auto-define
+import '@aarongustafson/pull-to-refresh';
 
-## 🎯 Use Cases
+// Class only
+import { PullToRefreshElement } from '@aarongustafson/pull-to-refresh/pull-to-refresh.js';
 
-Perfect for:
-- Reusable UI components
-- Design system elements
-- Form controls and widgets
-- Interactive content blocks
-- Accessibility-enhanced components
+// Both
+import { PullToRefreshElement } from '@aarongustafson/pull-to-refresh';
 
-## 🙏 Credits
+// Manual define script
+import '@aarongustafson/pull-to-refresh/define.js';
+```
 
-Based on best practices from:
-- [form-obfuscator](https://github.com/aarongustafson/form-obfuscator) by Aaron Gustafson
-- [Open Web Components](https://open-wc.org/)
+## 🤝 Contributing
+
+Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## 📄 License
 
 MIT - See [LICENSE](LICENSE)
 
-## 🤝 Contributing
+## 🙏 Credits
 
-Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md)
+Created by [Aaron Gustafson](https://github.com/aarongustafson)
 
 ---
 
-**Ready to build your web component?** Run `npm run setup` to get started! 🚀
+**Try it out!** Check out the [live demo](demo/index.html) 🚀
