@@ -144,6 +144,9 @@ export class PullToRefreshElement extends HTMLElement {
 			this.isPulling = true;
 			this.startY = e.clientY;
 
+			// Prevent text selection during pull
+			container.classList.add('pulling');
+
 			this.dispatchEvent(
 				new CustomEvent('ptr:pull-start', {
 					bubbles: true,
@@ -193,6 +196,12 @@ export class PullToRefreshElement extends HTMLElement {
 		if (!this.isPulling) return;
 
 		this.isPulling = false;
+
+		// Re-enable text selection
+		const container = this.shadowRoot.querySelector('.ptr-container');
+		if (container) {
+			container.classList.remove('pulling');
+		}
 
 		this.dispatchEvent(
 			new CustomEvent('ptr:pull-end', {
@@ -334,6 +343,11 @@ export class PullToRefreshElement extends HTMLElement {
 					overflow-y: auto;
 					-webkit-overflow-scrolling: touch;
 					position: relative;
+				}
+
+				.ptr-container.pulling {
+					user-select: none;
+					-webkit-user-select: none;
 				}
 
 				.ptr-indicator {
