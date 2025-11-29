@@ -1,8 +1,11 @@
-# &lt;pull-to-refresh&gt;
+# Pull to Refresh Web Component
+
+[![npm version](https://img.shields.io/npm/v/@aarongustafson/pull-to-refresh.svg)](https://www.npmjs.com/package/@aarongustafson/pull-to-refresh)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/aarongustafson/pull-to-refresh/ci.yml?branch=main)](https://github.com/aarongustafson/pull-to-refresh/actions)
 
 A lightweight, customizable Web Component that adds pull-to-refresh functionality to your web applications. Perfect for mobile-first experiences and progressive web apps.
 
-## ✨ Features
+## Features
 
 - **Touch-optimized**: Smooth pull gesture with momentum and feedback
 - **Customizable**: Adjust threshold, text, and styling via attributes and CSS custom properties
@@ -12,7 +15,7 @@ A lightweight, customizable Web Component that adds pull-to-refresh functionalit
 - **Lightweight**: No dependencies, just native Web Components
 - **Shadow DOM**: Encapsulated styles that won't leak
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 
@@ -68,7 +71,7 @@ import { PullToRefreshElement } from '@aarongustafson/pull-to-refresh';
 </script>
 ```
 
-## 📖 API
+## API
 
 ### Attributes
 
@@ -140,7 +143,7 @@ If you don't call `complete()`, the component will auto-complete after 2 seconds
 |--------|-------------|
 | `completeRefresh()` | Manually complete the refresh (alternative to calling `event.detail.complete()`) |
 
-## 🎨 Examples
+## Examples
 
 ### Custom Threshold
 
@@ -258,7 +261,7 @@ ptr.addEventListener('ptr:pull-move', (e) => {
 });
 ```
 
-## 🌍 Localization (i18n)
+## Localization (i18n)
 
 The component includes built-in translations for **16 languages**:
 
