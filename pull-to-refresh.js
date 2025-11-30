@@ -1,7 +1,7 @@
 import defaultTranslations from './translations.json' with { type: 'json' };
 
 /**
- * PullToRefreshElement - Refreshes the current document or runs a specific JavaScript function when pulling down on the page
+ * PullToRefreshElement - Web component that enables pull-to-refresh functionality
  *
  * @element pull-to-refresh
  *
