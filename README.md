@@ -5,6 +5,10 @@
 
 A lightweight, customizable Web Component that adds pull-to-refresh functionality to your web applications. Perfect for mobile-first experiences and progressive web apps.
 
+## Demo
+
+[Live Demo](https://aarongustafson.github.io/pull-to-refresh/demo/) ([Source](./demo/index.html))
+
 ## Features
 
 - **Touch-optimized**: Smooth pull gesture with momentum and feedback
