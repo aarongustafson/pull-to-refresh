@@ -1,6 +1,6 @@
 {
 	"name": "@aarongustafson/pull-to-refresh",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"description": "Refreshes the current document or runs a specific JavaScript function when pulling down on the page",
 	"keywords": [
 		"html",
