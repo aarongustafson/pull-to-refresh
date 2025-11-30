@@ -8,11 +8,225 @@
 			"declarations": [
 				{
 					"kind": "class",
-					"description": "Refreshes the current document or runs a specific JavaScript function when pulling down on the page",
+					"description": "Web component that enables pull-to-refresh functionality.",
 					"name": "PullToRefreshElement",
-					"members": [],
-					"events": [],
-					"attributes": [],
+					"members": [
+						{
+							"kind": "field",
+							"name": "threshold",
+							"type": {
+								"text": "number"
+							},
+							"default": "80",
+							"description": "Distance in pixels to trigger refresh",
+							"attribute": "threshold"
+						},
+						{
+							"kind": "field",
+							"name": "indicatorText",
+							"type": {
+								"text": "string"
+							},
+							"description": "Text shown when pulling down",
+							"attribute": "indicator-text"
+						},
+						{
+							"kind": "field",
+							"name": "releaseText",
+							"type": {
+								"text": "string"
+							},
+							"description": "Text shown when ready to release",
+							"attribute": "release-text"
+						},
+						{
+							"kind": "field",
+							"name": "refreshingText",
+							"type": {
+								"text": "string"
+							},
+							"description": "Text shown while refreshing",
+							"attribute": "refreshing-text"
+						},
+						{
+							"kind": "field",
+							"name": "disabled",
+							"type": {
+								"text": "boolean"
+							},
+							"default": "false",
+							"description": "Disables the pull-to-refresh functionality",
+							"attribute": "disabled"
+						},
+						{
+							"kind": "field",
+							"name": "disableSelection",
+							"type": {
+								"text": "boolean"
+							},
+							"default": "false",
+							"description": "Disables text selection during pull gesture",
+							"attribute": "disable-selection"
+						},
+						{
+							"kind": "method",
+							"name": "registerTranslations",
+							"static": true,
+							"parameters": [
+								{
+									"name": "translations",
+									"type": {
+										"text": "object"
+									},
+									"description": "Object containing translation strings for different languages"
+								}
+							],
+							"description": "Register custom translations for the component"
+						},
+						{
+							"kind": "method",
+							"name": "triggerRefresh",
+							"description": "Manually trigger a refresh action"
+						},
+						{
+							"kind": "method",
+							"name": "completeRefresh",
+							"description": "Complete the refresh action and reset the indicator"
+						}
+					],
+					"events": [
+						{
+							"name": "ptr:pull-start",
+							"type": {
+								"text": "CustomEvent"
+							},
+							"description": "Fired when pull gesture starts"
+						},
+						{
+							"name": "ptr:pull-move",
+							"type": {
+								"text": "CustomEvent"
+							},
+							"description": "Fired during pull gesture, contains { distance } in detail"
+						},
+						{
+							"name": "ptr:pull-end",
+							"type": {
+								"text": "CustomEvent"
+							},
+							"description": "Fired when pull gesture ends"
+						},
+						{
+							"name": "ptr:refresh",
+							"type": {
+								"text": "CustomEvent"
+							},
+							"description": "Fired when refresh is triggered"
+						},
+						{
+							"name": "ptr:refresh-complete",
+							"type": {
+								"text": "CustomEvent"
+							},
+							"description": "Fired when refresh completes"
+						}
+					],
+					"attributes": [
+						{
+							"name": "threshold",
+							"type": {
+								"text": "number"
+							},
+							"default": "80",
+							"description": "Distance in pixels to trigger refresh",
+							"fieldName": "threshold"
+						},
+						{
+							"name": "indicator-text",
+							"type": {
+								"text": "string"
+							},
+							"description": "Text shown when pulling down (default: localized \"↓ Pull to refresh\")",
+							"fieldName": "indicatorText"
+						},
+						{
+							"name": "release-text",
+							"type": {
+								"text": "string"
+							},
+							"description": "Text shown when ready to release (default: localized \"↻ Release to refresh\")",
+							"fieldName": "releaseText"
+						},
+						{
+							"name": "refreshing-text",
+							"type": {
+								"text": "string"
+							},
+							"description": "Text shown while refreshing (default: localized \"⏳ Refreshing...\")",
+							"fieldName": "refreshingText"
+						},
+						{
+							"name": "lang",
+							"type": {
+								"text": "string"
+							},
+							"description": "Language code for localization (falls back to closest [lang], document lang, or 'en')"
+						},
+						{
+							"name": "disabled",
+							"type": {
+								"text": "boolean"
+							},
+							"description": "Disables the pull-to-refresh functionality",
+							"fieldName": "disabled"
+						},
+						{
+							"name": "disable-selection",
+							"type": {
+								"text": "boolean"
+							},
+							"description": "Disables text selection during pull gesture",
+							"fieldName": "disableSelection"
+						}
+					],
+					"slots": [
+						{
+							"name": "",
+							"description": "Default slot for content"
+						},
+						{
+							"name": "indicator",
+							"description": "Optional custom indicator element"
+						}
+					],
+					"cssParts": [],
+					"cssProperties": [
+						{
+							"name": "--ptr-indicator-height",
+							"description": "Height of the indicator area",
+							"default": "3.125rem"
+						},
+						{
+							"name": "--ptr-indicator-bg",
+							"description": "Background color of the indicator",
+							"default": "ButtonFace"
+						},
+						{
+							"name": "--ptr-indicator-color",
+							"description": "Text color of the indicator",
+							"default": "ButtonText"
+						},
+						{
+							"name": "--ptr-indicator-font-size",
+							"description": "Font size of the indicator text",
+							"default": "0.875rem"
+						},
+						{
+							"name": "--ptr-transition-duration",
+							"description": "Duration of indicator transitions",
+							"default": "0.2s"
+						}
+					],
 					"superclass": {
 						"name": "HTMLElement"
 					},
