@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>pull-to-refresh via unpkg</title>
+		<style>
+			body {
+				font-family: system-ui, sans-serif;
+				margin: 0;
+			}
+
+			pull-to-refresh {
+				display: block;
+				min-height: 100vh;
+				background: #f5f5f5;
+			}
+
+			.content {
+				padding: 3rem 2rem;
+				max-width: 40rem;
+				margin: 0 auto;
+				line-height: 1.6;
+			}
+		</style>
+	</head>
+	<body>
+		<pull-to-refresh>
+			<div class="content">
+				<h1>unpkg CDN sanity check</h1>
+				<p>
+					This page loads the guarded definition helper from
+					<code>unpkg</code> and registers the element when supported.
+				</p>
+				<p>
+					Pull down to trigger the refresh event. The handler
+					completes after a short timeout.
+				</p>
+			</div>
+		</pull-to-refresh>
+
+		<script type="module">
+						import { definePullToRefresh } from 'https://unpkg.com/@aarongustafson/pull-to-refresh@latest/define.js?module';
+			+
+			+			definePullToRefresh();
+			+
+			+			document.addEventListener('ptr:refresh', (event) => {
+			+				setTimeout(() => event.detail.complete(), 750);
+			+			});
+		</script>
+	</body>
+</html>

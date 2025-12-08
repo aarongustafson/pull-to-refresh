@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>pull-to-refresh via esm.sh</title>
+		<style>
+			body {
+				font-family: system-ui, sans-serif;
+				margin: 0;
+			}
+
+			pull-to-refresh {
+				display: block;
+				min-height: 100vh;
+				background: #f5f5f5;
+			}
+
+			.content {
+				padding: 3rem 2rem;
+				max-width: 40rem;
+				margin: 0 auto;
+				line-height: 1.6;
+			}
+		</style>
+	</head>
+	<body>
+		<pull-to-refresh>
+			<div class="content">
+				<h1>esm.sh CDN sanity check</h1>
+				<p>
+					This page loads the component class from
+					<code>esm.sh</code> and registers it manually.
+				</p>
+				<p>
+					Pull down to trigger the refresh event. The handler
+					completes after a short timeout.
+				</p>
+			</div>
+		</pull-to-refresh>
+
+		<script type="module">
+			import { PullToRefreshElement } from 'https://esm.sh/@aarongustafson/pull-to-refresh@1.0.0/pull-to-refresh.js?bundle&target=es2022';
+
+			if (!customElements.get('pull-to-refresh')) {
+				customElements.define('pull-to-refresh', PullToRefreshElement);
+			}
+
+			document.addEventListener('ptr:refresh', (event) => {
+				setTimeout(() => event.detail.complete(), 750);
+			});
+		</script>
+	</body>
+</html>
