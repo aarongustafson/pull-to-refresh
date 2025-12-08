@@ -29,21 +29,31 @@ npm install @aarongustafson/pull-to-refresh
 
 ### Usage
 
-**Option 1: Auto-define (easiest)**
+**Option 1: Manual registration**
 ```javascript
-import '@aarongustafson/pull-to-refresh';
-```
+import { PullToRefreshElement } from '@aarongustafson/pull-to-refresh';
 
-**Option 2: Manual registration**
-```javascript
-import { PullToRefreshElement } from '@aarongustafson/pull-to-refresh/pull-to-refresh.js';
 customElements.define('pull-to-refresh', PullToRefreshElement);
 ```
 
-**Option 3: Both (class + auto-define)**
+**Option 2: Auto-define (browser environments only)**
 ```javascript
-import { PullToRefreshElement } from '@aarongustafson/pull-to-refresh';
-// Element is registered AND class is available
+import '@aarongustafson/pull-to-refresh/define.js';
+// Registers <pull-to-refresh> when customElements is available
+```
+
+Prefer to control when registration happens? Call the helper directly:
+
+```javascript
+import { definePullToRefresh } from '@aarongustafson/pull-to-refresh/define.js';
+
+definePullToRefresh();
+```
+
+You can also include the guarded script from HTML:
+
+```html
+<script src="./node_modules/@aarongustafson/pull-to-refresh/define.js" type="module"></script>
 ```
 
 ### Basic Example
