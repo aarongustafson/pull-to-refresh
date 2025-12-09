@@ -9,6 +9,11 @@ A lightweight, customizable Web Component that adds pull-to-refresh functionalit
 
 [Live Demo](https://aarongustafson.github.io/pull-to-refresh/demo/) ([Source](./demo/index.html))
 
+### Additional Demos
+
+- [esm.sh CDN](https://aarongustafson.github.io/pull-to-refresh/demo/esm.html) ([Source](./demo/esm.html)) - Loading from esm.sh
+- [unpkg CDN](https://aarongustafson.github.io/pull-to-refresh/demo/unpkg.html) ([Source](./demo/unpkg.html)) - Loading from unpkg
+
 ## Features
 
 - **Touch-optimized**: Smooth pull gesture with momentum and feedback
