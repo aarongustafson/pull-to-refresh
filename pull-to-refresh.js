@@ -199,28 +199,14 @@ export class PullToRefreshElement extends HTMLElement {
 	}
 
 	handleStart(e) {
-		console.log('[PTR] handleStart', {
-			type: e.type,
-			pointerId: e.pointerId,
-			pointerType: e.pointerType,
-			clientY: e.clientY,
-			target: e.target,
-		});
 		if (
 			this._container.scrollTop === 0 &&
 			!this.isRefreshing &&
 			!this.disabled
 		) {
-			console.log('[PTR] Starting pull (pending direction confirmation)');
 			this.isPulling = true;
 			this.isPullingConfirmed = false;
 			this.startY = e.clientY;
-		} else {
-			console.log('[PTR] Not starting pull', {
-				scrollTop: this._container.scrollTop,
-				isRefreshing: this.isRefreshing,
-				disabled: this.disabled,
-			});
 		}
 	}
 
@@ -229,25 +215,16 @@ export class PullToRefreshElement extends HTMLElement {
 
 		const deltaY = e.clientY - this.startY;
 
-		console.log('[PTR] handleMove', {
-			clientY: e.clientY,
-			startY: this.startY,
-			delta: deltaY,
-			isPullingConfirmed: this.isPullingConfirmed,
-		});
-
 		// If direction not yet confirmed, check if user is pulling down
 		if (!this.isPullingConfirmed) {
 			// Need some movement to determine direction (at least 5px)
 			if (Math.abs(deltaY) > 5) {
 				if (deltaY < 0) {
 					// Upward pull - cancel the gesture
-					console.log('[PTR] Upward pull detected, canceling');
 					this.isPulling = false;
 					return;
 				} else {
 					// Downward pull - confirm and proceed
-					console.log('[PTR] Downward pull confirmed');
 					this.isPullingConfirmed = true;
 
 					// Prevent text selection during pull if disable-selection is set
@@ -300,11 +277,6 @@ export class PullToRefreshElement extends HTMLElement {
 	}
 
 	handleEnd() {
-		console.log('[PTR] handleEnd', {
-			isPulling: this.isPulling,
-			currentY: this.currentY,
-			threshold: this.threshold,
-		});
 		if (!this.isPulling) return;
 
 		this.isPulling = false;
@@ -337,7 +309,6 @@ export class PullToRefreshElement extends HTMLElement {
 	}
 
 	async triggerRefresh() {
-		console.log('[PTR] triggerRefresh called');
 		this.isRefreshing = true;
 		this._indicator.textContent = this.refreshingText;
 		this._indicator.classList.add('active');
