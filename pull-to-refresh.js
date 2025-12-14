@@ -167,10 +167,26 @@ export class PullToRefreshElement extends HTMLElement {
 			return;
 		}
 
-		this.addEventListener('pointerdown', this.handleStart, this.__pointerDownOptions);
-		this.addEventListener('pointermove', this.handleMove, this.__pointerMoveOptions);
-		this.addEventListener('pointerup', this.handleEnd, this.__pointerUpOptions);
-		this.addEventListener('pointercancel', this.handleEnd, this.__pointerCancelOptions);
+		this.addEventListener(
+			'pointerdown',
+			this.handleStart,
+			this.__pointerDownOptions,
+		);
+		this.addEventListener(
+			'pointermove',
+			this.handleMove,
+			this.__pointerMoveOptions,
+		);
+		this.addEventListener(
+			'pointerup',
+			this.handleEnd,
+			this.__pointerUpOptions,
+		);
+		this.addEventListener(
+			'pointercancel',
+			this.handleEnd,
+			this.__pointerCancelOptions,
+		);
 
 		if (!this._container) {
 			this._container = this.shadowRoot.querySelector('.ptr-container');
@@ -191,10 +207,26 @@ export class PullToRefreshElement extends HTMLElement {
 			return;
 		}
 
-		this.removeEventListener('pointerdown', this.handleStart, this.__pointerDownOptions);
-		this.removeEventListener('pointermove', this.handleMove, this.__pointerMoveOptions);
-		this.removeEventListener('pointerup', this.handleEnd, this.__pointerUpOptions);
-		this.removeEventListener('pointercancel', this.handleEnd, this.__pointerCancelOptions);
+		this.removeEventListener(
+			'pointerdown',
+			this.handleStart,
+			this.__pointerDownOptions,
+		);
+		this.removeEventListener(
+			'pointermove',
+			this.handleMove,
+			this.__pointerMoveOptions,
+		);
+		this.removeEventListener(
+			'pointerup',
+			this.handleEnd,
+			this.__pointerUpOptions,
+		);
+		this.removeEventListener(
+			'pointercancel',
+			this.handleEnd,
+			this.__pointerCancelOptions,
+		);
 
 		if (this._container) {
 			this._container.removeEventListener(
