@@ -50,58 +50,6 @@ export class PullToRefreshElement extends HTMLElement {
 		];
 	}
 
-	static styles = `
-		:host {
-			display: block;
-			position: relative;
-			height: 100vh;
-			overflow: hidden;
-		}
-
-		:host([pulling][disable-selection]) ::slotted(*) {
-			user-select: none;
-			-webkit-user-select: none;
-		}
-
-		.ptr-container {
-			height: 100%;
-			overflow-y: auto;
-			-webkit-overflow-scrolling: touch;
-			position: relative;
-		}
-
-		.ptr-indicator {
-			position: absolute;
-			top: 0;
-			left: 0;
-			right: 0;
-			height: var(--ptr-indicator-height, 3.125rem);
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			background: var(--ptr-indicator-bg, ButtonFace);
-			color: var(--ptr-indicator-color, ButtonText);
-			font-size: var(--ptr-indicator-font-size, 0.875rem);
-			transform: translateY(-3.125rem);
-			transition: transform var(--ptr-transition-duration, 0.2s) ease;
-			z-index: 1000;
-			user-select: none;
-			-webkit-user-select: none;
-		}
-
-		.ptr-indicator.active {
-			/* Active state can be styled via CSS parts or custom properties */
-		}
-
-		.ptr-content {
-			position: relative;
-		}
-
-		:host([disabled]) .ptr-container {
-			touch-action: auto;
-		}
-	`;
-
 	constructor() {
 		super();
 		this.attachShadow({ mode: 'open' });
@@ -112,17 +60,22 @@ export class PullToRefreshElement extends HTMLElement {
 		this.isPulling = false;
 		this.isPullingConfirmed = false;
 		this.isRefreshing = false;
+		this.__listenersAttached = false;
+		this.__refreshTimeoutId = null;
 
 		// Cached DOM references (set after render)
 		this._container = null;
 		this._indicator = null;
+		this._indicatorTextEl = null;
 
 		// Language detection
-		this.__lang =
-			this.getAttribute('lang') ||
-			this.closest('[lang]')?.getAttribute('lang') ||
-			document.documentElement.lang ||
-			'en';
+		this.__lang = 'en';
+
+		this.__pointerDownOptions = { passive: true };
+		this.__pointerMoveOptions = { passive: false };
+		this.__pointerUpOptions = { passive: true };
+		this.__pointerCancelOptions = { passive: true };
+		this.__scrollOptions = { passive: true };
 
 		// Bind event handlers
 		this.handleStart = this.handleStart.bind(this);
@@ -132,28 +85,47 @@ export class PullToRefreshElement extends HTMLElement {
 	}
 
 	connectedCallback() {
+		this.__upgradeProperty('threshold');
+		this.__upgradeProperty('indicatorText');
+		this.__upgradeProperty('releaseText');
+		this.__upgradeProperty('refreshingText');
+		this.__upgradeProperty('disabled');
+		this.__upgradeProperty('disableSelection');
+		this.__lang = this.__resolveLang();
+
 		this.render();
 		this.setupEventListeners();
 	}
 
 	disconnectedCallback() {
 		this.removeEventListeners();
+		this.__clearRefreshTimeout();
 	}
 
 	attributeChangedCallback(name, oldValue, newValue) {
-		if (oldValue !== newValue) {
-			if (name === 'lang') {
-				this.__lang = newValue || 'en';
+		if (oldValue === newValue) {
+			return;
+		}
+
+		switch (name) {
+			case 'lang':
+				this.__lang = this.__resolveLang();
 				this.updateIndicatorText();
-			}
-			if (name === 'disabled') {
+				break;
+			case 'indicator-text':
+			case 'release-text':
+			case 'refreshing-text':
+				this.updateIndicatorText();
+				break;
+			case 'disabled':
 				if (this.disabled) {
 					this.removeEventListeners();
 				} else {
 					this.setupEventListeners();
 				}
-			}
-			this.updateIndicatorText();
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -170,36 +142,56 @@ export class PullToRefreshElement extends HTMLElement {
 	}
 
 	setupEventListeners() {
-		if (this.disabled) return;
-
-		this.addEventListener('pointerdown', this.handleStart, {
-			passive: true,
-		});
-		this.addEventListener('pointermove', this.handleMove, {
-			passive: false,
-		});
-		this.addEventListener('pointerup', this.handleEnd);
-		this.addEventListener('pointercancel', this.handleEnd);
-
-		const container = this.shadowRoot.querySelector('.ptr-container');
-		if (container) {
-			container.addEventListener('scroll', this.handleScroll);
+		if (this.disabled || this.__listenersAttached) {
+			return;
 		}
+
+		this.addEventListener('pointerdown', this.handleStart, this.__pointerDownOptions);
+		this.addEventListener('pointermove', this.handleMove, this.__pointerMoveOptions);
+		this.addEventListener('pointerup', this.handleEnd, this.__pointerUpOptions);
+		this.addEventListener('pointercancel', this.handleEnd, this.__pointerCancelOptions);
+
+		if (!this._container) {
+			this._container = this.shadowRoot.querySelector('.ptr-container');
+		}
+		if (this._container) {
+			this._container.addEventListener(
+				'scroll',
+				this.handleScroll,
+				this.__scrollOptions,
+			);
+		}
+
+		this.__listenersAttached = true;
 	}
 
 	removeEventListeners() {
-		this.removeEventListener('pointerdown', this.handleStart);
-		this.removeEventListener('pointermove', this.handleMove);
-		this.removeEventListener('pointerup', this.handleEnd);
-		this.removeEventListener('pointercancel', this.handleEnd);
+		if (!this.__listenersAttached) {
+			return;
+		}
 
-		if (!this._container) return;
+		this.removeEventListener('pointerdown', this.handleStart, this.__pointerDownOptions);
+		this.removeEventListener('pointermove', this.handleMove, this.__pointerMoveOptions);
+		this.removeEventListener('pointerup', this.handleEnd, this.__pointerUpOptions);
+		this.removeEventListener('pointercancel', this.handleEnd, this.__pointerCancelOptions);
 
-		this._container.removeEventListener('scroll', this.handleScroll);
+		if (this._container) {
+			this._container.removeEventListener(
+				'scroll',
+				this.handleScroll,
+				this.__scrollOptions,
+			);
+		}
+
+		this.__listenersAttached = false;
 	}
 
 	handleStart(e) {
+		if (!this._container) {
+			this._container = this.shadowRoot.querySelector('.ptr-container');
+		}
 		if (
+			this._container &&
 			this._container.scrollTop === 0 &&
 			!this.isRefreshing &&
 			!this.disabled
@@ -248,7 +240,9 @@ export class PullToRefreshElement extends HTMLElement {
 		this.currentY = deltaY;
 
 		if (this.currentY > 0) {
-			e.preventDefault(); // Prevent scroll bounce
+			if (e.cancelable) {
+				e.preventDefault(); // Prevent scroll bounce
+			}
 
 			const indicatorHeight = this.indicatorHeight;
 			const translateY = Math.min(
@@ -256,14 +250,15 @@ export class PullToRefreshElement extends HTMLElement {
 				indicatorHeight,
 			);
 
-			this._indicator.style.transform = `translateY(${translateY}px)`;
-
-			if (this.currentY > this.threshold) {
-				this._indicator.textContent = this.releaseText;
-				this._indicator.classList.add('active');
-			} else {
-				this._indicator.textContent = this.indicatorText;
-				this._indicator.classList.remove('active');
+			if (this._indicator) {
+				this._indicator.style.transform = `translateY(${translateY}px)`;
+				if (this.currentY > this.threshold) {
+					this.__setIndicatorText(this.releaseText);
+					this._indicator.classList.add('active');
+				} else {
+					this.__setIndicatorText(this.indicatorText);
+					this._indicator.classList.remove('active');
+				}
 			}
 
 			this.dispatchEvent(
@@ -309,8 +304,11 @@ export class PullToRefreshElement extends HTMLElement {
 	}
 
 	async triggerRefresh() {
+		if (this.isRefreshing) {
+			return;
+		}
 		this.isRefreshing = true;
-		this._indicator.textContent = this.refreshingText;
+		this.__setIndicatorText(this.refreshingText);
 		this._indicator.classList.add('active');
 
 		const refreshEvent = new CustomEvent('ptr:refresh', {
@@ -324,7 +322,7 @@ export class PullToRefreshElement extends HTMLElement {
 		this.dispatchEvent(refreshEvent);
 
 		// If no listener calls complete(), auto-complete after a delay
-		setTimeout(() => {
+		this.__refreshTimeoutId = setTimeout(() => {
 			if (this.isRefreshing) {
 				this.completeRefresh();
 			}
@@ -334,6 +332,7 @@ export class PullToRefreshElement extends HTMLElement {
 	completeRefresh() {
 		this.isRefreshing = false;
 		this.resetIndicator();
+ 		this.__clearRefreshTimeout();
 
 		this.dispatchEvent(
 			new CustomEvent('ptr:refresh-complete', {
@@ -351,7 +350,7 @@ export class PullToRefreshElement extends HTMLElement {
 
 		this._indicator.style.transform = `translateY(${-this.indicatorHeight}px)`;
 		this._indicator.classList.remove('active');
-		this._indicator.textContent = this.indicatorText;
+		this.__setIndicatorText(this.indicatorText);
 
 		// Re-enable announcements after text is updated
 		// Use setTimeout to ensure the text change happens first
@@ -363,7 +362,7 @@ export class PullToRefreshElement extends HTMLElement {
 	updateIndicatorText() {
 		if (!this._indicator || this.isPulling || this.isRefreshing) return;
 
-		this._indicator.textContent = this.indicatorText;
+		this.__setIndicatorText(this.indicatorText);
 	}
 
 	get threshold() {
@@ -371,7 +370,11 @@ export class PullToRefreshElement extends HTMLElement {
 	}
 
 	set threshold(value) {
-		this.setAttribute('threshold', value);
+		if (value === null || value === undefined || value === '') {
+			this.removeAttribute('threshold');
+			return;
+		}
+		this.setAttribute('threshold', String(value));
 	}
 
 	get indicatorText() {
@@ -380,6 +383,10 @@ export class PullToRefreshElement extends HTMLElement {
 	}
 
 	set indicatorText(value) {
+		if (value === null || value === undefined) {
+			this.removeAttribute('indicator-text');
+			return;
+		}
 		this.setAttribute('indicator-text', value);
 	}
 
@@ -389,6 +396,10 @@ export class PullToRefreshElement extends HTMLElement {
 	}
 
 	set releaseText(value) {
+		if (value === null || value === undefined) {
+			this.removeAttribute('release-text');
+			return;
+		}
 		this.setAttribute('release-text', value);
 	}
 
@@ -398,6 +409,10 @@ export class PullToRefreshElement extends HTMLElement {
 	}
 
 	set refreshingText(value) {
+		if (value === null || value === undefined) {
+			this.removeAttribute('refreshing-text');
+			return;
+		}
 		this.setAttribute('refreshing-text', value);
 	}
 
@@ -487,7 +502,9 @@ export class PullToRefreshElement extends HTMLElement {
 			<style>${PullToRefreshElement.styles}</style>
 			<div class="ptr-container">
 				<div class="ptr-indicator" role="status" aria-live="assertive">
-					<slot name="indicator">${this.indicatorText}</slot>
+					<slot name="indicator">
+						<span class="ptr-indicator-text">${this.indicatorText}</span>
+					</slot>
 				</div>
 				<div class="ptr-content">
 					<slot></slot>
@@ -498,5 +515,40 @@ export class PullToRefreshElement extends HTMLElement {
 		// Cache DOM references for efficiency
 		this._container = this.shadowRoot.querySelector('.ptr-container');
 		this._indicator = this.shadowRoot.querySelector('.ptr-indicator');
+		this._indicatorTextEl = this.shadowRoot.querySelector(
+			'.ptr-indicator-text',
+		);
+		this.__setIndicatorText(this.indicatorText);
+	}
+
+	__resolveLang() {
+		return (
+			this.getAttribute('lang') ||
+			this.closest('[lang]')?.getAttribute('lang') ||
+			document.documentElement.lang ||
+			'en'
+		);
+	}
+
+	__setIndicatorText(text) {
+		if (!this._indicatorTextEl) {
+			return;
+		}
+		this._indicatorTextEl.textContent = text;
+	}
+
+	__clearRefreshTimeout() {
+		if (this.__refreshTimeoutId !== null) {
+			clearTimeout(this.__refreshTimeoutId);
+			this.__refreshTimeoutId = null;
+		}
+	}
+
+	__upgradeProperty(prop) {
+		if (Object.prototype.hasOwnProperty.call(this, prop)) {
+			const value = this[prop];
+			delete this[prop];
+			this[prop] = value;
+		}
 	}
 }
