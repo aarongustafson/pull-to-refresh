@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { PullToRefreshElement } from '../pull-to-refresh.js';
 
 describe('PullToRefreshElement', () => {
@@ -7,6 +7,11 @@ describe('PullToRefreshElement', () => {
 	beforeEach(() => {
 		element = document.createElement('pull-to-refresh');
 		document.body.appendChild(element);
+	});
+
+	afterEach(() => {
+		element?.remove();
+		document.body.innerHTML = '';
 	});
 
 	it('should be defined', () => {
@@ -76,6 +81,16 @@ describe('PullToRefreshElement', () => {
 			element.removeAttribute('disable-selection');
 			expect(element.disableSelection).toBe(false);
 		});
+
+		it('should reset invalid threshold attribute values', () => {
+			element.setAttribute('threshold', '-10');
+			expect(element.hasAttribute('threshold')).toBe(false);
+			expect(element.threshold).toBe(80);
+
+			element.setAttribute('threshold', 'not-a-number');
+			expect(element.hasAttribute('threshold')).toBe(false);
+			expect(element.threshold).toBe(80);
+		});
 	});
 
 	describe('Properties', () => {
@@ -111,6 +126,55 @@ describe('PullToRefreshElement', () => {
 			expect(element.hasAttribute('disable-selection')).toBe(true);
 			element.disableSelection = false;
 			expect(element.hasAttribute('disable-selection')).toBe(false);
+		});
+
+		it('should sanitize negative threshold property assignments', () => {
+			element.threshold = -5;
+			expect(element.hasAttribute('threshold')).toBe(false);
+			expect(element.threshold).toBe(80);
+		});
+	});
+
+	describe('Reflection & Upgrades', () => {
+		it('should upgrade properties set before connection', () => {
+			const preConnected = document.createElement('pull-to-refresh');
+			preConnected.threshold = 140;
+			preConnected.indicatorText = 'Pre-connect';
+			preConnected.disabled = true;
+
+			document.body.appendChild(preConnected);
+
+			expect(preConnected.threshold).toBe(140);
+			expect(preConnected.getAttribute('indicator-text')).toBe(
+				'Pre-connect',
+			);
+			expect(preConnected.disabled).toBe(true);
+
+			preConnected.remove();
+		});
+
+		it('should sync indicator text content when attributes change', () => {
+			const indicatorTextEl = element.shadowRoot.querySelector(
+				'.ptr-indicator-text',
+			);
+			element.setAttribute('indicator-text', 'Updated text');
+			expect(indicatorTextEl.textContent).toBe('Updated text');
+		});
+
+		it('should show release text once threshold is exceeded during pull', () => {
+			element.handleStart(
+				new PointerEvent('pointerdown', {
+					clientY: 0,
+				}),
+			);
+			const releaseEvent = new PointerEvent('pointermove', {
+				clientY: element.threshold + 10,
+			});
+			element.handleMove(releaseEvent);
+			const indicatorTextEl = element.shadowRoot.querySelector(
+				'.ptr-indicator-text',
+			);
+			expect(indicatorTextEl.textContent).toBe(element.releaseText);
 		});
 	});
 
@@ -205,7 +269,7 @@ describe('PullToRefreshElement', () => {
 			element.triggerRefresh();
 			const indicator =
 				element.shadowRoot.querySelector('.ptr-indicator');
-			expect(indicator.textContent).toBe('⏳ Refreshing...');
+			expect(indicator.textContent.trim()).toBe('⏳ Refreshing...');
 		});
 
 		it('should reset indicator after completion', () => {
@@ -216,7 +280,7 @@ describe('PullToRefreshElement', () => {
 			element.triggerRefresh();
 			const indicator =
 				element.shadowRoot.querySelector('.ptr-indicator');
-			expect(indicator.textContent).toBe('↓ Pull to refresh');
+			expect(indicator.textContent.trim()).toBe('↓ Pull to refresh');
 		});
 	});
 
