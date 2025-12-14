@@ -20,13 +20,16 @@
 	"type": "module",
 	"main": "index.js",
 	"module": "pull-to-refresh.js",
+	"types": "pull-to-refresh.d.ts",
 	"customElements": "custom-elements.json",
 	"exports": {
 		".": {
-			"import": "./index.js"
+			"import": "./index.js",
+			"types": "./pull-to-refresh.d.ts"
 		},
 		"./pull-to-refresh.js": {
-			"import": "./pull-to-refresh.js"
+			"import": "./pull-to-refresh.js",
+			"types": "./pull-to-refresh.d.ts"
 		},
 		"./define.js": {
 			"import": "./define.js"
@@ -35,6 +38,7 @@
 	},
 	"files": [
 		"pull-to-refresh.js",
+		"pull-to-refresh.d.ts",
 		"define.js",
 		"index.js",
 		"translations.json",
@@ -43,7 +47,7 @@
 		"LICENSE"
 	],
 	"engines": {
-		"node": ">=14.0.0"
+		"node": ">=20.0.0"
 	},
 	"scripts": {
 		"setup": "node scripts/setup.js",

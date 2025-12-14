@@ -23,6 +23,14 @@ A lightweight, customizable Web Component that adds pull-to-refresh functionalit
 - **Framework-agnostic**: Works with any framework or vanilla JavaScript
 - **Lightweight**: No dependencies, just native Web Components
 - **Shadow DOM**: Encapsulated styles that won't leak
+- **TypeScript-ready**: Bundled definitions for editors and build tooling
+
+## TypeScript & Framework Support
+
+- Bundled `.d.ts` files describe both `PullToRefreshElement` and `definePullToRefresh`, so modern editors provide autocomplete without extra config.
+- Threshold/text/disabled props now reflect to attributes, keeping declarative templates in sync with imperative code.
+- `_upgradeProperty` preserves pre-upgrade assignments—handy for SSR, hydration, and framework wrappers.
+- Global `HTMLElementTagNameMap` augmentation lets TypeScript understand `document.querySelector('pull-to-refresh')` out of the box.
 
 ## Quick Start
 
