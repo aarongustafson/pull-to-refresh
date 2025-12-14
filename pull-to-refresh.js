@@ -62,6 +62,7 @@ export class PullToRefreshElement extends HTMLElement {
 		this.isRefreshing = false;
 		this.__listenersAttached = false;
 		this.__refreshTimeoutId = null;
+		this.__ariaLiveResetTimeoutId = null;
 
 		// Cached DOM references (set after render)
 		this._container = null;
@@ -101,6 +102,7 @@ export class PullToRefreshElement extends HTMLElement {
 	disconnectedCallback() {
 		this.removeEventListeners();
 		this.__clearRefreshTimeout();
+		this.__clearAriaLiveResetTimeout();
 	}
 
 	attributeChangedCallback(name, oldValue, newValue) {
@@ -374,8 +376,12 @@ export class PullToRefreshElement extends HTMLElement {
 
 		// Re-enable announcements after text is updated
 		// Use setTimeout to ensure the text change happens first
-		setTimeout(() => {
-			this._indicator.setAttribute('aria-live', 'assertive');
+		this.__clearAriaLiveResetTimeout();
+		this.__ariaLiveResetTimeoutId = setTimeout(() => {
+			if (this._indicator) {
+				this._indicator.setAttribute('aria-live', 'assertive');
+			}
+			this.__ariaLiveResetTimeoutId = null;
 		}, 0);
 	}
 
@@ -592,6 +598,13 @@ export class PullToRefreshElement extends HTMLElement {
 		if (this.__refreshTimeoutId !== null) {
 			clearTimeout(this.__refreshTimeoutId);
 			this.__refreshTimeoutId = null;
+		}
+	}
+
+	__clearAriaLiveResetTimeout() {
+		if (this.__ariaLiveResetTimeoutId !== null) {
+			clearTimeout(this.__ariaLiveResetTimeoutId);
+			this.__ariaLiveResetTimeoutId = null;
 		}
 	}
 
