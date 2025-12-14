@@ -91,6 +91,7 @@ export class PullToRefreshElement extends HTMLElement {
 		this.__upgradeProperty('refreshingText');
 		this.__upgradeProperty('disabled');
 		this.__upgradeProperty('disableSelection');
+		this.__upgradeProperty('lang');
 		this.__lang = this.__resolveLang();
 
 		this.render();
@@ -110,18 +111,36 @@ export class PullToRefreshElement extends HTMLElement {
 		switch (name) {
 			case 'lang':
 				this.__lang = this.__resolveLang();
-				this.updateIndicatorText();
+				this.updateIndicatorText({ force: true });
 				break;
 			case 'indicator-text':
 			case 'release-text':
 			case 'refreshing-text':
-				this.updateIndicatorText();
+				this.updateIndicatorText({ force: true });
 				break;
+			case 'threshold': {
+				if (newValue !== null) {
+					const numericValue = Number(newValue);
+					if (!Number.isFinite(numericValue) || numericValue < 0) {
+						this.removeAttribute('threshold');
+						break;
+					}
+				}
+				this.updateIndicatorText({ force: true });
+				break;
+			}
 			case 'disabled':
 				if (this.disabled) {
 					this.removeEventListeners();
+					this.resetIndicator();
 				} else {
 					this.setupEventListeners();
+					this.updateIndicatorText({ force: true });
+				}
+				break;
+			case 'disable-selection':
+				if (!this.disableSelection) {
+					this.removeAttribute('pulling');
 				}
 				break;
 			default:
@@ -253,13 +272,12 @@ export class PullToRefreshElement extends HTMLElement {
 			if (this._indicator) {
 				this._indicator.style.transform = `translateY(${translateY}px)`;
 				if (this.currentY > this.threshold) {
-					this.__setIndicatorText(this.releaseText);
 					this._indicator.classList.add('active');
 				} else {
-					this.__setIndicatorText(this.indicatorText);
 					this._indicator.classList.remove('active');
 				}
 			}
+			this.__updateIndicatorTextForState();
 
 			this.dispatchEvent(
 				new CustomEvent('ptr:pull-move', {
@@ -308,8 +326,10 @@ export class PullToRefreshElement extends HTMLElement {
 			return;
 		}
 		this.isRefreshing = true;
-		this.__setIndicatorText(this.refreshingText);
-		this._indicator.classList.add('active');
+		this.__updateIndicatorTextForState();
+		if (this._indicator) {
+			this._indicator.classList.add('active');
+		}
 
 		const refreshEvent = new CustomEvent('ptr:refresh', {
 			bubbles: true,
@@ -332,7 +352,7 @@ export class PullToRefreshElement extends HTMLElement {
 	completeRefresh() {
 		this.isRefreshing = false;
 		this.resetIndicator();
- 		this.__clearRefreshTimeout();
+		this.__clearRefreshTimeout();
 
 		this.dispatchEvent(
 			new CustomEvent('ptr:refresh-complete', {
@@ -350,7 +370,7 @@ export class PullToRefreshElement extends HTMLElement {
 
 		this._indicator.style.transform = `translateY(${-this.indicatorHeight}px)`;
 		this._indicator.classList.remove('active');
-		this.__setIndicatorText(this.indicatorText);
+		this.__updateIndicatorTextForState();
 
 		// Re-enable announcements after text is updated
 		// Use setTimeout to ensure the text change happens first
@@ -359,14 +379,18 @@ export class PullToRefreshElement extends HTMLElement {
 		}, 0);
 	}
 
-	updateIndicatorText() {
-		if (!this._indicator || this.isPulling || this.isRefreshing) return;
+	updateIndicatorText({ force = false } = {}) {
+		if (this.isPulling && !force && !this.isRefreshing) {
+			return;
+		}
 
-		this.__setIndicatorText(this.indicatorText);
+		this.__updateIndicatorTextForState();
 	}
 
 	get threshold() {
-		return parseInt(this.getAttribute('threshold')) || 80;
+		const attrValue = this.getAttribute('threshold');
+		const parsed = parseInt(attrValue ?? '', 10);
+		return Number.isFinite(parsed) ? parsed : 80;
 	}
 
 	set threshold(value) {
@@ -374,7 +398,12 @@ export class PullToRefreshElement extends HTMLElement {
 			this.removeAttribute('threshold');
 			return;
 		}
-		this.setAttribute('threshold', String(value));
+		const numericValue = Number(value);
+		if (!Number.isFinite(numericValue) || numericValue < 0) {
+			this.removeAttribute('threshold');
+			return;
+		}
+		this.setAttribute('threshold', String(Math.round(numericValue)));
 	}
 
 	get indicatorText() {
@@ -518,7 +547,7 @@ export class PullToRefreshElement extends HTMLElement {
 		this._indicatorTextEl = this.shadowRoot.querySelector(
 			'.ptr-indicator-text',
 		);
-		this.__setIndicatorText(this.indicatorText);
+		this.__updateIndicatorTextForState();
 	}
 
 	__resolveLang() {
@@ -535,6 +564,28 @@ export class PullToRefreshElement extends HTMLElement {
 			return;
 		}
 		this._indicatorTextEl.textContent = text;
+	}
+
+	__updateIndicatorTextForState() {
+		if (!this._indicatorTextEl) {
+			return;
+		}
+
+		if (this.isRefreshing) {
+			this.__setIndicatorText(this.refreshingText);
+			return;
+		}
+
+		if (this.isPulling) {
+			if (this.currentY > this.threshold) {
+				this.__setIndicatorText(this.releaseText);
+			} else {
+				this.__setIndicatorText(this.indicatorText);
+			}
+			return;
+		}
+
+		this.__setIndicatorText(this.indicatorText);
 	}
 
 	__clearRefreshTimeout() {
