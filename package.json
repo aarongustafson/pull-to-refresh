@@ -24,12 +24,12 @@
 	"customElements": "custom-elements.json",
 	"exports": {
 		".": {
-			"import": "./index.js",
-			"types": "./pull-to-refresh.d.ts"
+			"types": "./pull-to-refresh.d.ts",
+			"import": "./index.js"
 		},
 		"./pull-to-refresh.js": {
-			"import": "./pull-to-refresh.js",
-			"types": "./pull-to-refresh.d.ts"
+			"types": "./pull-to-refresh.d.ts",
+			"import": "./pull-to-refresh.js"
 		},
 		"./define.js": {
 			"import": "./define.js"
@@ -47,10 +47,9 @@
 		"LICENSE"
 	],
 	"engines": {
-		"node": ">=20.0.0"
+		"node": ">=22.0.0"
 	},
 	"scripts": {
-		"setup": "node scripts/setup.js",
 		"test": "vitest",
 		"test:ui": "vitest --ui",
 		"test:run": "vitest run",
