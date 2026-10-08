@@ -32,6 +32,7 @@
 			"import": "./pull-to-refresh.js"
 		},
 		"./define.js": {
+			"types": "./define.d.ts",
 			"import": "./define.js"
 		},
 		"./custom-elements.json": "./custom-elements.json"
@@ -40,6 +41,7 @@
 		"pull-to-refresh.js",
 		"pull-to-refresh.d.ts",
 		"define.js",
+		"define.d.ts",
 		"index.js",
 		"translations.json",
 		"custom-elements.json",
