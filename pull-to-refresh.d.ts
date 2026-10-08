@@ -27,8 +27,6 @@ export declare class PullToRefreshElement extends HTMLElement {
 	completeRefresh(): void;
 }
 
-export declare function definePullToRefresh(tagName?: string): boolean;
-
 declare global {
 	interface HTMLElementTagNameMap {
 		'pull-to-refresh': PullToRefreshElement;
