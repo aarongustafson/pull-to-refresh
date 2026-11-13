@@ -421,3 +421,69 @@ test('reduced motion uses the existing indicator transition hook', async ({
 			.evaluate((node) => getComputedStyle(node).transitionDuration),
 	).toBe('0s');
 });
+
+for (const mode of [
+	{ name: 'light', colorScheme: 'light', forcedColors: 'none' },
+	{ name: 'dark', colorScheme: 'dark', forcedColors: 'none' },
+	{ name: 'forced', colorScheme: 'light', forcedColors: 'active' },
+]) {
+	test(`${mode.name}: inline and block component marks remain readable without changing generic code or navigation`, async ({
+		page,
+		browserName,
+	}) => {
+		test.skip(
+			mode.forcedColors === 'active' && browserName === 'webkit',
+			'WebKit does not implement forced-colors emulation.',
+		);
+		await page.emulateMedia({
+			colorScheme: mode.colorScheme,
+			forcedColors: mode.forcedColors,
+		});
+		await demo(page, 'index');
+		await expect(page.locator('code mark')).toHaveCount(36);
+		await expect(page.locator('pre code mark')).toHaveCount(14);
+		await expect(page.locator('mark mark')).toHaveCount(0);
+		const inline = page.locator('.api-reference code mark').first();
+		const block = page.locator('pre code mark').first();
+		for (const mark of [inline, block]) {
+			expect(await contrast(mark)).toBeGreaterThanOrEqual(4.5);
+			expect(
+				await mark.evaluate((node) => {
+					const probe = document.createElement('mark');
+					probe.style.color = 'MarkText';
+					probe.style.background = 'Mark';
+					document.body.append(probe);
+					const expected = getComputedStyle(probe);
+					const actual = getComputedStyle(node);
+					const result =
+						actual.color === expected.color &&
+						actual.backgroundColor === expected.backgroundColor &&
+						(!CSS.supports('forced-color-adjust', 'auto') ||
+							actual.forcedColorAdjust === 'auto');
+					probe.remove();
+					return result;
+				}),
+			).toBe(true);
+		}
+		const generic = page.locator('code').filter({ hasText: /^en-US$/ });
+		await expect(generic.locator('mark')).toHaveCount(0);
+		await page.keyboard.press(browserName === 'webkit' ? 'Alt+Tab' : 'Tab');
+		await expect(
+			page
+				.locator('header')
+				.getByRole('link', { name: 'README', exact: true }),
+		).toBeFocused();
+		for (const width of [1280, 320]) {
+			await page.setViewportSize({ width, height: 900 });
+			await page.evaluate(() => {
+				document.documentElement.style.fontSize = '200%';
+			});
+			expect(
+				await page.evaluate(
+					() => document.documentElement.scrollWidth <= innerWidth,
+				),
+			).toBe(true);
+			await expect(inline).toBeVisible();
+		}
+	});
+}

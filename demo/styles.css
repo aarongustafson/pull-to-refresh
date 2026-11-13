@@ -176,7 +176,7 @@ pre code {
 	font-size: inherit;
 }
 
-pre code mark {
+code mark {
 	background: Mark;
 	color: MarkText;
 	border-radius: 2px;
