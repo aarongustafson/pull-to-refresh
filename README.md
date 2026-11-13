@@ -1,7 +1,10 @@
 # Pull to Refresh Web Component
 
 [![npm version](https://img.shields.io/npm/v/@aarongustafson/pull-to-refresh.svg)](https://www.npmjs.com/package/@aarongustafson/pull-to-refresh)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/aarongustafson/pull-to-refresh/ci.yml?branch=main)](https://github.com/aarongustafson/pull-to-refresh/actions)
+[![CI status](https://img.shields.io/github/actions/workflow/status/aarongustafson/pull-to-refresh/ci.yml?branch=main&label=CI)](https://github.com/aarongustafson/pull-to-refresh/actions/workflows/ci.yml)
+[![Minified + gzipped size](https://img.shields.io/bundlejs/size/@aarongustafson/pull-to-refresh?format=minzip&label=min%2Bgzip)](https://bundlejs.com/?q=@aarongustafson/pull-to-refresh)
+[![License](https://img.shields.io/npm/l/@aarongustafson/pull-to-refresh)](https://github.com/aarongustafson/pull-to-refresh/blob/main/LICENSE)
+[![Type definitions](https://img.shields.io/npm/types/@aarongustafson/pull-to-refresh)](https://github.com/aarongustafson/pull-to-refresh/blob/main/pull-to-refresh.d.ts)
 
 A lightweight, customizable Web Component that adds pull-to-refresh functionality to your web applications. Perfect for mobile-first experiences and progressive web apps.
 
