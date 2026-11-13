@@ -20,19 +20,17 @@ describe('demo surface contracts', () => {
 		file.endsWith('.html'),
 	)) {
 		it(`${file} links README navigation to rendered documentation`, () => {
-			const document = new DOMParser().parseFromString(
-				read(`demo/${file}`),
-				'text/html',
-			);
-			const links = [...document.querySelectorAll('a')].filter(
-				(link) => link.textContent.trim() === 'README',
-			);
+			const links = [
+				...read(`demo/${file}`).matchAll(
+					/<a\b([^>]*)>\s*README\s*<\/a\s*>/g,
+				),
+			];
 			expect(links.length).toBeGreaterThan(0);
-			for (const link of links) {
-				expect(link.getAttribute('href')).toBe(
-					'https://github.com/aarongustafson/pull-to-refresh/blob/main/README.md',
+			for (const [, attributes] of links) {
+				expect(attributes).toContain(
+					'href="https://github.com/aarongustafson/pull-to-refresh/blob/main/README.md"',
 				);
-				expect(link.hasAttribute('download')).toBe(false);
+				expect(attributes).not.toMatch(/\bdownload\b/);
 			}
 		});
 
