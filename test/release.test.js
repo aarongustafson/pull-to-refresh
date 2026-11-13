@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import {
 	copyFileSync,
 	mkdirSync,
@@ -10,8 +10,21 @@ import {
 import { resolve, join } from 'node:path';
 import { it, expect } from 'vitest';
 
-it('preserves release scripts and versioned CDN updates without bumping the package', () => {
+function displayedCodeHash(html) {
+	const texts = [...html.matchAll(/<code\b[^>]*>([\s\S]*?)<\/code\s*>/g)].map(
+		([, contents]) => {
+			const code = document.createElement('code');
+			code.innerHTML = contents;
+			return code.textContent;
+		},
+	);
+	return createHash('sha256').update(JSON.stringify(texts)).digest('hex');
+}
+
+it('preserves release scripts and highlighting text hashes through future CDN version updates without bumping the package', () => {
 	const root = resolve(`.release-check-${randomUUID()}`);
+	const originalDemo = readFileSync('demo/esm.html', 'utf8');
+	const originalCodeHash = displayedCodeHash(originalDemo);
 	try {
 		mkdirSync(root);
 		mkdirSync(join(root, 'scripts'));
@@ -30,9 +43,18 @@ it('preserves release scripts and versioned CDN updates without bumping the pack
 		execFileSync(process.execPath, ['scripts/update-demo-versions.js'], {
 			cwd: root,
 		});
-		expect(readFileSync(join(root, 'demo/esm.html'), 'utf8')).toContain(
-			'pull-to-refresh@9.8.7/',
-		);
+		const updatedDemo = readFileSync(join(root, 'demo/esm.html'), 'utf8');
+		expect(updatedDemo).toContain('pull-to-refresh@9.8.7/');
+		expect(updatedDemo).not.toBe(originalDemo);
+		expect(displayedCodeHash(updatedDemo)).toBe(originalCodeHash);
+		expect(
+			displayedCodeHash(
+				updatedDemo.replace(
+					'<code>esm.sh</code>',
+					'<code>changed provider label</code>',
+				),
+			),
+		).not.toBe(originalCodeHash);
 	} finally {
 		rmSync(root, { recursive: true, force: true });
 	}
