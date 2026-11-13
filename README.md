@@ -43,6 +43,7 @@ npm install @aarongustafson/pull-to-refresh
 ### Usage
 
 **Option 1: Manual registration**
+
 ```javascript
 import { PullToRefreshElement } from '@aarongustafson/pull-to-refresh';
 
@@ -50,6 +51,7 @@ customElements.define('pull-to-refresh', PullToRefreshElement);
 ```
 
 **Option 2: Auto-define (browser environments only)**
+
 ```javascript
 import '@aarongustafson/pull-to-refresh/define.js';
 // Registers <pull-to-refresh> when customElements is available
@@ -66,7 +68,10 @@ definePullToRefresh();
 You can also include the guarded script from HTML:
 
 ```html
-<script src="./node_modules/@aarongustafson/pull-to-refresh/define.js" type="module"></script>
+<script
+  src="./node_modules/@aarongustafson/pull-to-refresh/define.js"
+  type="module"
+></script>
 ```
 
 ### Basic Example
@@ -87,8 +92,8 @@ You can also include the guarded script from HTML:
   ptr.addEventListener('ptr:refresh', (e) => {
     // Perform your refresh logic (fetch data, etc.)
     fetch('/api/data')
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         // Update your content
         updateContent(data);
         // Signal completion
@@ -102,15 +107,15 @@ You can also include the guarded script from HTML:
 
 ### Attributes
 
-| Attribute | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `threshold` | number | `80` | Distance in pixels to trigger refresh |
-| `indicator-text` | string | localized | Text shown when pulling down |
-| `release-text` | string | localized | Text shown when ready to release |
-| `refreshing-text` | string | localized | Text shown while refreshing |
-| `lang` | string | auto-detected | Language code for localization |
-| `disabled` | boolean | `false` | Disables pull-to-refresh functionality |
-| `disable-selection` | boolean | `false` | Prevents text selection during pull gesture |
+| Attribute           | Type    | Default       | Description                                 |
+| ------------------- | ------- | ------------- | ------------------------------------------- |
+| `threshold`         | number  | `80`          | Distance in pixels to trigger refresh       |
+| `indicator-text`    | string  | localized     | Text shown when pulling down                |
+| `release-text`      | string  | localized     | Text shown when ready to release            |
+| `refreshing-text`   | string  | localized     | Text shown while refreshing                 |
+| `lang`              | string  | auto-detected | Language code for localization              |
+| `disabled`          | boolean | `false`       | Disables pull-to-refresh functionality      |
+| `disable-selection` | boolean | `false`       | Prevents text selection during pull gesture |
 
 **Note:** The text attributes use automatic localization based on the `lang` attribute or auto-detection. See [Localization](#-localization-i18n) below.
 
@@ -127,13 +132,13 @@ ptr.disabled = true;
 
 ### Events
 
-| Event | Detail | Description |
-|-------|--------|-------------|
-| `ptr:pull-start` | `{}` | Fired when pull gesture starts |
-| `ptr:pull-move` | `{ distance: number }` | Fired during pull gesture |
-| `ptr:pull-end` | `{}` | Fired when pull gesture ends |
-| `ptr:refresh` | `{ complete: Function }` | Fired when refresh is triggered |
-| `ptr:refresh-complete` | `{}` | Fired when refresh completes |
+| Event                  | Detail                   | Description                     |
+| ---------------------- | ------------------------ | ------------------------------- |
+| `ptr:pull-start`       | `{}`                     | Fired when pull gesture starts  |
+| `ptr:pull-move`        | `{ distance: number }`   | Fired during pull gesture       |
+| `ptr:pull-end`         | `{}`                     | Fired when pull gesture ends    |
+| `ptr:refresh`          | `{ complete: Function }` | Fired when refresh is triggered |
+| `ptr:refresh-complete` | `{}`                     | Fired when refresh completes    |
 
 **Important**: Call `event.detail.complete()` in your `ptr:refresh` handler to signal completion:
 
@@ -149,25 +154,25 @@ If you don't call `complete()`, the component will auto-complete after 2 seconds
 
 ### Slots
 
-| Slot | Description |
-|------|-------------|
-| (default) | Your scrollable content |
+| Slot        | Description                       |
+| ----------- | --------------------------------- |
+| (default)   | Your scrollable content           |
 | `indicator` | Optional custom indicator element |
 
 ### CSS Custom Properties
 
-| Property | Default | Description |
-|----------|---------|-------------|
-| `--ptr-indicator-height` | `3.125rem` | Height of the indicator area |
-| `--ptr-indicator-bg` | `ButtonFace` | Background color of indicator |
-| `--ptr-indicator-color` | `ButtonText` | Text color of indicator |
-| `--ptr-indicator-font-size` | `0.875rem` | Font size of indicator text |
-| `--ptr-transition-duration` | `0.2s` | Duration of indicator transitions |
+| Property                    | Default      | Description                       |
+| --------------------------- | ------------ | --------------------------------- |
+| `--ptr-indicator-height`    | `3.125rem`   | Height of the indicator area      |
+| `--ptr-indicator-bg`        | `ButtonFace` | Background color of indicator     |
+| `--ptr-indicator-color`     | `ButtonText` | Text color of indicator           |
+| `--ptr-indicator-font-size` | `0.875rem`   | Font size of indicator text       |
+| `--ptr-transition-duration` | `0.2s`       | Duration of indicator transitions |
 
 ### Methods
 
-| Method | Description |
-|--------|-------------|
+| Method              | Description                                                                      |
+| ------------------- | -------------------------------------------------------------------------------- |
 | `completeRefresh()` | Manually complete the refresh (alternative to calling `event.detail.complete()`) |
 
 ## Examples
@@ -202,6 +207,7 @@ The component automatically detects the language and displays localized text:
 ```
 
 The component supports 16 languages with automatic fallback to English. Language is detected from:
+
 1. The element's `lang` attribute
 2. The nearest ancestor's `lang` attribute
 3. The document's `lang` attribute
@@ -216,8 +222,8 @@ PullToRefreshElement.registerTranslations({
   'pt-BR': {
     indicator: '↓ Puxe para atualizar',
     release: '↻ Solte para atualizar',
-    refreshing: '⏳ Atualizando...'
-  }
+    refreshing: '⏳ Atualizando...',
+  },
 });
 ```
 
@@ -226,8 +232,8 @@ PullToRefreshElement.registerTranslations({
 ```html
 <style>
   pull-to-refresh {
-    --ptr-indicator-bg: #f0f0f0;
-    --ptr-indicator-color: #1976d2;
+    --ptr-indicator-bg: #102030;
+    --ptr-indicator-color: #ffffff;
     --ptr-indicator-font-size: 1rem;
     --ptr-indicator-height: 3.75rem;
   }
@@ -238,13 +244,41 @@ PullToRefreshElement.registerTranslations({
 </pull-to-refresh>
 ```
 
+The indicator defaults to `ButtonText` on `ButtonFace`. Set
+`--ptr-indicator-bg` and `--ptr-indicator-color` together; changing one can
+make the other unreadable. Custom properties override these defaults and
+inherit from the host. A custom slotted indicator supplies its own markup
+and styles. Test your complete pair, including nested text, in each supported
+scheme and user palette. Automatic forced-color adjustment remains enabled.
+The indicator uses different authored or localized messages for pulling,
+release, and loading, rather than color alone.
+
+The demos use `CanvasText` on `Canvas` for reading surfaces and status
+messages, `ButtonText` on `ButtonFace` for code and buttons, and
+`MarkText` on `Mark` for marked examples. They preserve native keyboard focus.
+Each standalone demo includes a native Refresh form: enhancement runs the
+existing refresh handler; without JavaScript or a successful module load,
+the form reloads the document. The component does not generate a keyboard
+button. Supply one for tasks that must not depend on a pull gesture.
+Keep existing data visible during loading or failure, provide a readable
+error and retry action, and call `event.detail.complete()` when your handler
+finishes. Completion reports the end of the interaction, not success.
+
+Recorded-palette substitution and browser emulation are regression checks,
+not proof of native high-contrast repainting or assistive-technology support.
+The recorded study’s 19 distinct palettes pass the tested demo pairs; bundled
+Ubuntu WebKit has a known dark `ButtonText`/`ButtonFace` contrast limitation
+outside that dataset. The browser suite tracks it as a narrowly scoped expected
+failure instead of replacing every platform’s native pair.
+
 ### Custom Messages
 
 ```html
 <pull-to-refresh
   indicator-text="⬇ Swipe down"
   release-text="🔄 Let go!"
-  refreshing-text="⏳ Loading...">
+  refreshing-text="⏳ Loading..."
+>
   <div>Content here</div>
 </pull-to-refresh>
 ```
@@ -292,24 +326,24 @@ ptr.addEventListener('ptr:pull-move', (e) => {
 
 The component includes built-in translations for **16 languages**:
 
-| Language | Code | Indicator Text |
-|----------|------|----------------|
-| English | `en` | ↓ Pull to refresh |
-| Chinese (Mandarin) | `zh` | ↓ 下拉刷新 |
-| Hindi | `hi` | ↓ रीफ्रेश करने के लिए खींचें |
-| Spanish | `es` | ↓ Desliza para actualizar |
-| French | `fr` | ↓ Tirez pour actualiser |
-| Arabic | `ar` | ↓ اسحب للتحديث |
-| Bengali | `bn` | ↓ রিফ্রেশ করতে টানুন |
-| Portuguese | `pt` | ↓ Puxe para atualizar |
-| Russian | `ru` | ↓ Потяните для обновления |
-| Japanese | `ja` | ↓ 引っ張って更新 |
-| German | `de` | ↓ Zum Aktualisieren ziehen |
-| Punjabi | `pa` | ↓ ਤਾਜ਼ਾ ਕਰਨ ਲਈ ਖਿੱਚੋ |
-| Javanese | `jv` | ↓ Tarik kanggo nyegerake |
-| Korean | `ko` | ↓ 당겨서 새로고침 |
-| Vietnamese | `vi` | ↓ Kéo để làm mới |
-| Italian | `it` | ↓ Trascina per aggiornare |
+| Language           | Code | Indicator Text               |
+| ------------------ | ---- | ---------------------------- |
+| English            | `en` | ↓ Pull to refresh            |
+| Chinese (Mandarin) | `zh` | ↓ 下拉刷新                   |
+| Hindi              | `hi` | ↓ रीफ्रेश करने के लिए खींचें |
+| Spanish            | `es` | ↓ Desliza para actualizar    |
+| French             | `fr` | ↓ Tirez pour actualiser      |
+| Arabic             | `ar` | ↓ اسحب للتحديث               |
+| Bengali            | `bn` | ↓ রিফ্রেশ করতে টানুন         |
+| Portuguese         | `pt` | ↓ Puxe para atualizar        |
+| Russian            | `ru` | ↓ Потяните для обновления    |
+| Japanese           | `ja` | ↓ 引っ張って更新             |
+| German             | `de` | ↓ Zum Aktualisieren ziehen   |
+| Punjabi            | `pa` | ↓ ਤਾਜ਼ਾ ਕਰਨ ਲਈ ਖਿੱਚੋ         |
+| Javanese           | `jv` | ↓ Tarik kanggo nyegerake     |
+| Korean             | `ko` | ↓ 당겨서 새로고침            |
+| Vietnamese         | `vi` | ↓ Kéo để làm mới             |
+| Italian            | `it` | ↓ Trascina per aggiornare    |
 
 ### Language Detection
 
@@ -331,20 +365,20 @@ import { PullToRefreshElement } from '@aarongustafson/pull-to-refresh';
 
 // Add a new language
 PullToRefreshElement.registerTranslations({
-  'nl': {
+  nl: {
     indicator: '↓ Trek om te vernieuwen',
     release: '↻ Loslaten om te vernieuwen',
-    refreshing: '⏳ Vernieuwen...'
-  }
+    refreshing: '⏳ Vernieuwen...',
+  },
 });
 
 // Override existing translations
 PullToRefreshElement.registerTranslations({
-  'en': {
+  en: {
     indicator: '⬇ Pull down',
     release: '🔄 Let go',
-    refreshing: '⏳ Loading...'
-  }
+    refreshing: '⏳ Loading...',
+  },
 });
 ```
 
@@ -356,7 +390,8 @@ You can always override translations for individual instances:
 <pull-to-refresh
   lang="es"
   indicator-text="Custom Spanish text"
-  release-text="Custom release text">
+  release-text="Custom release text"
+>
   <!-- Content -->
 </pull-to-refresh>
 ```
@@ -382,6 +417,7 @@ npm run format         # Format code
 ## Browser Support
 
 Works in all modern browsers supporting:
+
 - Custom Elements v1
 - Shadow DOM v1
 - ES Modules

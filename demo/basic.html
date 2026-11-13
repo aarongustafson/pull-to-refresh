@@ -4,6 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>Basic Pull-to-Refresh Demo</title>
+		<link rel="stylesheet" href="./styles.css" />
 		<style>
 			* {
 				margin: 0;
@@ -31,8 +32,8 @@
 			}
 
 			.status {
-				background: CanvasText;
-				color: Canvas;
+				background: Canvas;
+				color: CanvasText;
 				padding: 10px;
 				margin: 10px 0;
 				border-radius: 4px;
@@ -41,7 +42,7 @@
 			}
 			.random-number {
 				font-weight: bold;
-				color: LinkText;
+				color: inherit;
 			}
 		</style>
 	</head>
@@ -54,9 +55,32 @@
 					Random number:
 					<span class="random-number" id="random">0</span>
 				</p>
-				<div class="status" id="status">Ready</div>
+				<div class="status" id="status" role="status">Ready</div>
+				<label
+					><input type="checkbox" id="fail-refresh" /> Simulate a
+					failed refresh</label
+				>
+				<form data-refresh><button type="submit">Refresh</button></form>
+				<p>The Refresh button reloads the page if enhancement fails.</p>
+				<noscript
+					><p>
+						JavaScript is off. Your content remains available; use
+						Refresh to reload.
+					</p></noscript
+				>
 			</div>
 		</pull-to-refresh>
+		<footer>
+			<p>
+				Made with ❤️ by
+				<a href="https://github.com/aarongustafson">Aaron Gustafson</a>.
+				<a href="../README.md">README</a> ·
+				<a href="https://github.com/aarongustafson/pull-to-refresh"
+					>GitHub</a
+				>.
+			</p>
+		</footer>
+		<script src="./refresh.js" type="module"></script>
 
 		<script src="../define.js" type="module"></script>
 		<script>
@@ -67,6 +91,14 @@
 			demo.addEventListener('ptr:refresh', (e) => {
 				status.textContent = 'Refreshing...';
 				setTimeout(() => {
+					const failure = document.getElementById('fail-refresh');
+					if (failure.checked) {
+						failure.checked = false;
+						e.detail.complete();
+						status.textContent =
+							'Refresh failed. Your previous number is unchanged. Use Refresh to try again.';
+						return;
+					}
 					random.textContent = Math.floor(Math.random() * 1000);
 					e.detail.complete();
 				}, 1500);

@@ -21,7 +21,7 @@
 
 			.demo iframe {
 				width: 100%;
-				height: 300px;
+				height: 420px;
 				border: none;
 				display: block;
 			}
@@ -33,13 +33,13 @@
 				background: Canvas;
 				border-top: 1px solid;
 				color: LinkText;
-				text-decoration: none;
+				text-decoration: underline;
 				font-size: 0.875rem;
 				transition: background 0.2s;
 			}
 
 			.demo-link:hover {
-				background: SelectedItem;
+				text-decoration-thickness: 0.15em;
 			}
 
 			.demo-link::after {
@@ -54,21 +54,32 @@
 			<p>
 				Refreshes the current document or runs a specific JavaScript
 				function when pulling down on the page. See the
-				<a
-					href="../"
-					>README</a
-				>
+				<a href="../README.md">README</a>
 				for installation and API documentation.
 			</p>
 		</header>
 
 		<main>
+			<p>
+				Each example includes a native Refresh button. With JavaScript
+				it runs the same refresh handler; without enhancement it reloads
+				the document. The component itself does not add a keyboard
+				control.
+			</p>
+			<noscript
+				><p>
+					JavaScript is off. The examples’ content and Refresh forms
+					remain available.
+				</p></noscript
+			>
 			<!-- Basic Example -->
 			<section>
 				<h2>Basic Example</h2>
 				<p>
 					Pull down from the top to trigger a refresh. The random
-					number will update.
+					number will update. Use “Simulate a failed refresh” to keep
+					the previous number and show a retry message. The Refresh
+					button works with a keyboard.
 				</p>
 
 				<div class="demo-section">
@@ -396,10 +407,7 @@
 
 				<p>
 					For complete documentation and browser support, see the
-					<a
-						href="../"
-						>README</a
-					>.
+					<a href="../README.md">README</a>.
 				</p>
 			</section>
 		</main>

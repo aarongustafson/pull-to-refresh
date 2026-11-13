@@ -4,6 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>Japanese Pull-to-Refresh Demo</title>
+		<link rel="stylesheet" href="./styles.css" />
 		<style>
 			* {
 				margin: 0;
@@ -34,7 +35,8 @@
 			}
 
 			.status {
-				background: #e3f2fd;
+				background: Canvas;
+				color: CanvasText;
 				padding: 10px;
 				margin: 10px 0;
 				border-radius: 4px;
@@ -43,7 +45,7 @@
 			}
 			.random-number {
 				font-weight: bold;
-				color: #1976d2;
+				color: inherit;
 			}
 		</style>
 	</head>
@@ -56,9 +58,30 @@
 					ランダム番号:
 					<span class="random-number" id="random">0</span>
 				</p>
-				<div class="status" id="status">準備完了</div>
+				<div class="status" id="status" role="status">準備完了</div>
+				<form data-refresh><button type="submit">更新</button></form>
+				<p>
+					機能を読み込めない場合、このボタンでページを再読み込みできます。
+				</p>
+				<noscript
+					><p>
+						JavaScript
+						は無効です。コンテンツは引き続き利用できます。「更新」で再読み込みしてください。
+					</p></noscript
+				>
 			</div>
 		</pull-to-refresh>
+		<footer>
+			<p>
+				制作 ❤️
+				<a href="https://github.com/aarongustafson">Aaron Gustafson</a
+				>。<a href="../README.md">README</a> ·
+				<a href="https://github.com/aarongustafson/pull-to-refresh"
+					>GitHub</a
+				>。
+			</p>
+		</footer>
+		<script src="./refresh.js" type="module"></script>
 
 		<script src="../define.js" type="module"></script>
 		<script>
