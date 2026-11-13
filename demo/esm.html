@@ -10,6 +10,7 @@
 				display: block;
 				min-height: 100vh;
 				background: Canvas;
+				color: CanvasText;
 			}
 
 			.content {
@@ -34,6 +35,31 @@
 				</p>
 			</div>
 		</pull-to-refresh>
+		<form data-refresh><button type="submit">Refresh</button></form>
+		<p>
+			If the CDN or JavaScript is unavailable, Refresh reloads the
+			document. Content remains available.
+		</p>
+		<noscript
+			><p>
+				JavaScript is off. Use Refresh to reload this page.
+			</p></noscript
+		>
+		<footer>
+			<p>
+				Made with ❤️ by
+				<a href="https://github.com/aarongustafson">Aaron Gustafson</a>.
+				<a
+					href="https://github.com/aarongustafson/pull-to-refresh/blob/main/README.md"
+					>README</a
+				>
+				·
+				<a href="https://github.com/aarongustafson/pull-to-refresh"
+					>GitHub</a
+				>.
+			</p>
+		</footer>
+		<script src="./refresh.js" type="module"></script>
 
 		<script type="module">
 			import { PullToRefreshElement } from 'https://esm.sh/@aarongustafson/pull-to-refresh@1.1.1/pull-to-refresh.js?bundle&target=es2022';

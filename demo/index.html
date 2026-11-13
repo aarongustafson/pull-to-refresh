@@ -21,7 +21,7 @@
 
 			.demo iframe {
 				width: 100%;
-				height: 300px;
+				height: 420px;
 				border: none;
 				display: block;
 			}
@@ -33,13 +33,13 @@
 				background: Canvas;
 				border-top: 1px solid;
 				color: LinkText;
-				text-decoration: none;
+				text-decoration: underline;
 				font-size: 0.875rem;
 				transition: background 0.2s;
 			}
 
 			.demo-link:hover {
-				background: SelectedItem;
+				text-decoration-thickness: 0.15em;
 			}
 
 			.demo-link::after {
@@ -55,7 +55,7 @@
 				Refreshes the current document or runs a specific JavaScript
 				function when pulling down on the page. See the
 				<a
-					href="../"
+					href="https://github.com/aarongustafson/pull-to-refresh/blob/main/README.md"
 					>README</a
 				>
 				for installation and API documentation.
@@ -63,19 +63,33 @@
 		</header>
 
 		<main>
+			<p>
+				Each example includes a native Refresh button. With JavaScript
+				it runs the same refresh handler; without enhancement it reloads
+				the document. The component itself does not add a keyboard
+				control.
+			</p>
+			<noscript
+				><p>
+					JavaScript is off. The examples’ content and Refresh forms
+					remain available.
+				</p></noscript
+			>
 			<!-- Basic Example -->
 			<section>
 				<h2>Basic Example</h2>
 				<p>
 					Pull down from the top to trigger a refresh. The random
-					number will update.
+					number will update. Use “Simulate a failed refresh” to keep
+					the previous number and show a retry message. The Refresh
+					button works with a keyboard.
 				</p>
 
 				<div class="demo-section">
 					<h3>Basic Usage</h3>
 					<p>
 						The component listens for pull gestures and fires a
-						<code>ptr:refresh</code> event.
+						<code><mark>ptr:refresh</mark></code> event.
 					</p>
 					<div class="code-demo-pair">
 						<pre><code><mark>&lt;pull-to-refresh&gt;</mark>
@@ -172,8 +186,9 @@
 				<h2>Disable Text Selection</h2>
 				<p>
 					By default, text selection is allowed during pull gestures.
-					Use the <code>disable-selection</code> attribute to prevent
-					accidental text selection while pulling.
+					Use the
+					<code><mark>disable-selection</mark></code> attribute to
+					prevent accidental text selection while pulling.
 				</p>
 
 				<div class="demo-section">
@@ -213,7 +228,9 @@
 
 				<div class="demo-section">
 					<h3>Spanish (Español)</h3>
-					<p>Using the <code>lang="es"</code> attribute.</p>
+					<p>
+						Using the <code><mark>lang="es"</mark></code> attribute.
+					</p>
 					<div class="code-demo-pair">
 						<pre><code><mark>&lt;pull-to-refresh lang="es"&gt;</mark>
   &lt;div class="content"&gt;
@@ -237,7 +254,9 @@
 
 				<div class="demo-section">
 					<h3>French (Français)</h3>
-					<p>Using the <code>lang="fr"</code> attribute.</p>
+					<p>
+						Using the <code><mark>lang="fr"</mark></code> attribute.
+					</p>
 					<div class="code-demo-pair">
 						<pre><code><mark>&lt;pull-to-refresh lang="fr"&gt;</mark>
   &lt;div class="content"&gt;
@@ -261,7 +280,9 @@
 
 				<div class="demo-section">
 					<h3>Japanese (日本語)</h3>
-					<p>Using the <code>lang="ja"</code> attribute.</p>
+					<p>
+						Using the <code><mark>lang="ja"</mark></code> attribute.
+					</p>
 					<div class="code-demo-pair">
 						<pre><code><mark>&lt;pull-to-refresh lang="ja"&gt;</mark>
   &lt;div class="content"&gt;
@@ -319,85 +340,87 @@
 				<h3>Attributes</h3>
 				<ul>
 					<li>
-						<code>threshold</code> - Distance in pixels to trigger
-						refresh (default: 80)
+						<code><mark>threshold</mark></code> - Distance in pixels
+						to trigger refresh (default: 80)
 					</li>
 					<li>
-						<code>indicator-text</code> - Text when pulling
-						(default: localized "↓ Pull to refresh")
+						<code><mark>indicator-text</mark></code> - Text when
+						pulling (default: localized "↓ Pull to refresh")
 					</li>
 					<li>
-						<code>release-text</code> - Text when ready to release
-						(default: localized "↻ Release to refresh")
+						<code><mark>release-text</mark></code> - Text when ready
+						to release (default: localized "↻ Release to refresh")
 					</li>
 					<li>
-						<code>refreshing-text</code> - Text while refreshing
-						(default: localized "⏳ Refreshing...")
+						<code><mark>refreshing-text</mark></code> - Text while
+						refreshing (default: localized "⏳ Refreshing...")
 					</li>
 					<li>
-						<code>lang</code> - Language code for localization
-						(auto-detected from element, ancestor, or document)
+						<code><mark>lang</mark></code> - Language code for
+						localization (auto-detected from element, ancestor, or
+						document)
 					</li>
 					<li>
-						<code>disabled</code> - Disables pull-to-refresh
-						functionality
+						<code><mark>disabled</mark></code> - Disables
+						pull-to-refresh functionality
 					</li>
 					<li>
-						<code>disable-selection</code> - Prevents text selection
-						during pull gesture
+						<code><mark>disable-selection</mark></code> - Prevents
+						text selection during pull gesture
 					</li>
 				</ul>
 				<h3>Events</h3>
 				<ul>
 					<li>
-						<code>ptr:pull-start</code> - Fired when pull gesture
-						starts
+						<code><mark>ptr:pull-start</mark></code> - Fired when
+						pull gesture starts
 					</li>
 					<li>
-						<code>ptr:pull-move</code> - Fired during pull (detail
-						contains distance)
+						<code><mark>ptr:pull-move</mark></code> - Fired during
+						pull (detail contains distance)
 					</li>
 					<li>
-						<code>ptr:pull-end</code> - Fired when pull gesture ends
+						<code><mark>ptr:pull-end</mark></code> - Fired when pull
+						gesture ends
 					</li>
 					<li>
-						<code>ptr:refresh</code> - Fired when refresh is
-						triggered
+						<code><mark>ptr:refresh</mark></code> - Fired when
+						refresh is triggered
 					</li>
 					<li>
-						<code>ptr:refresh-complete</code> - Fired when refresh
-						completes
+						<code><mark>ptr:refresh-complete</mark></code> - Fired
+						when refresh completes
 					</li>
 				</ul>
 
 				<h3>CSS Custom Properties</h3>
 				<ul>
 					<li>
-						<code>--ptr-indicator-height</code> - Height of
-						indicator (default: 3.125rem)
+						<code><mark>--ptr-indicator-height</mark></code> -
+						Height of indicator (default: 3.125rem)
 					</li>
 					<li>
-						<code>--ptr-indicator-bg</code> - Indicator background
-						(default: ButtonFace)
+						<code><mark>--ptr-indicator-bg</mark></code> - Indicator
+						background (default: ButtonFace)
 					</li>
 					<li>
-						<code>--ptr-indicator-color</code> - Indicator text
-						color (default: ButtonText)
+						<code><mark>--ptr-indicator-color</mark></code> -
+						Indicator text color (default: ButtonText)
 					</li>
 					<li>
-						<code>--ptr-indicator-font-size</code> - Indicator font
-						size (default: 0.875rem)
+						<code><mark>--ptr-indicator-font-size</mark></code> -
+						Indicator font size (default: 0.875rem)
 					</li>
 					<li>
-						<code>--ptr-transition-duration</code> - Transition
-						duration (default: 0.2s)
+						<code><mark>--ptr-transition-duration</mark></code> -
+						Transition duration (default: 0.2s)
 					</li>
 				</ul>
 
 				<p>
 					For complete documentation and browser support, see the
 					<a
-						href="../"
+						href="https://github.com/aarongustafson/pull-to-refresh/blob/main/README.md"
 						>README</a
 					>.
 				</p>
