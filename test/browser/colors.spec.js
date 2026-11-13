@@ -409,3 +409,15 @@ test('forced-color emulation retains automatic adjustment, native focus and labe
 	await expect(page.locator('#status')).toHaveText('Refreshing...');
 	await expect(page.locator('#status')).toContainText('Complete');
 });
+
+test('reduced motion uses the existing indicator transition hook', async ({
+	page,
+}) => {
+	await page.emulateMedia({ reducedMotion: 'reduce' });
+	await demo(page);
+	expect(
+		await page
+			.locator('.ptr-indicator')
+			.evaluate((node) => getComputedStyle(node).transitionDuration),
+	).toBe('0s');
+});

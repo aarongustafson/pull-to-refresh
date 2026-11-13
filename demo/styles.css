@@ -350,6 +350,10 @@ small {
 }
 
 @media (prefers-reduced-motion: reduce) {
+	pull-to-refresh {
+		--ptr-transition-duration: 0s;
+	}
+
 	* {
 		scroll-behavior: auto !important;
 		transition: none !important;
