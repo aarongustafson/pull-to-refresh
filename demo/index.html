@@ -5,6 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>Pull-to-refresh Web Component Demo</title>
 		<link rel="stylesheet" href="./styles.css" />
+		<link rel="stylesheet" href="./demo-shell.css" />
 		<style>
 			/* Demo-specific styles */
 			body {
@@ -48,10 +49,12 @@
 			}
 		</style>
 	</head>
-	<body>
+	<body data-syntax-theme="github">
+		<a class="skip-link" href="#main">Skip to examples</a>
 		<header>
-			<h1>Pull-to-refresh Web Component Demo</h1>
-			<p>
+			<p class="eyebrow">Web component / Examples</p>
+			<h1>&lt;pull-to-refresh&gt;</h1>
+			<p class="lede">
 				Refreshes the current document or runs a specific JavaScript
 				function when pulling down on the page. See the
 				<a
@@ -60,9 +63,27 @@
 				>
 				for installation and API documentation.
 			</p>
+			<nav aria-label="Component resources">
+				<a
+					href="https://github.com/aarongustafson/pull-to-refresh/blob/main/README.md"
+					>Read the README</a
+				>
+				<a href="https://github.com/aarongustafson/pull-to-refresh"
+					>View on GitHub</a
+				>
+				<a href="./esm.html">esm.sh example</a>
+				<a href="./unpkg.html">unpkg example</a>
+			</nav>
 		</header>
 
-		<main>
+		<main id="main" tabindex="-1">
+			<p
+				id="microlighter-status"
+				class="enhancement-status"
+				role="status"
+				hidden
+			></p>
+
 			<p>
 				Each example includes a native Refresh button. With JavaScript
 				it runs the same refresh handler; without enhancement it reloads
@@ -92,13 +113,23 @@
 						<code><mark>ptr:refresh</mark></code> event.
 					</p>
 					<div class="code-demo-pair">
-						<pre><code><mark>&lt;pull-to-refresh&gt;</mark>
+						<micro-lighter
+							class="code-panel"
+							language="html"
+							controls="copy"
+							data-label="HTML"
+						>
+							<pre
+								aria-label="Basic Usage code 1"
+								tabindex="0"
+							><code><mark>&lt;pull-to-refresh&gt;</mark>
   &lt;div class="content"&gt;
     &lt;h3&gt;My Content&lt;/h3&gt;
     &lt;p&gt;Pull down to refresh&lt;/p&gt;
     &lt;p&gt;Random: &lt;span id="random1"&gt;0&lt;/span&gt;&lt;/p&gt;
   &lt;/div&gt;
 <mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
+						</micro-lighter>
 						<div class="demo">
 							<iframe
 								src="basic.html"
@@ -127,11 +158,21 @@
 					<h3>Using threshold Attribute</h3>
 					<p>You need to pull further down to trigger the refresh.</p>
 					<div class="code-demo-pair">
-						<pre><code><mark>&lt;pull-to-refresh threshold="120"&gt;</mark>
+						<micro-lighter
+							class="code-panel"
+							language="html"
+							controls="copy"
+							data-label="HTML"
+						>
+							<pre
+								aria-label="Using threshold Attribute code 2"
+								tabindex="0"
+							><code><mark>&lt;pull-to-refresh threshold="120"&gt;</mark>
   &lt;div class="content"&gt;
     &lt;p&gt;Pull 120px to refresh&lt;/p&gt;
   &lt;/div&gt;
 <mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
+						</micro-lighter>
 						<div class="demo">
 							<iframe
 								src="threshold.html"
@@ -157,7 +198,16 @@
 					<h3>Custom Messages</h3>
 					<p>Using custom text for the indicator states.</p>
 					<div class="code-demo-pair">
-						<pre><code><mark>&lt;pull-to-refresh
+						<micro-lighter
+							class="code-panel"
+							language="html"
+							controls="copy"
+							data-label="HTML"
+						>
+							<pre
+								aria-label="Custom Messages code 3"
+								tabindex="0"
+							><code><mark>&lt;pull-to-refresh
   indicator-text="⬇ Swipe down"
   release-text="🔄 Let go!"
   refreshing-text="⏳ Loading..."&gt;</mark>
@@ -165,6 +215,7 @@
     &lt;p&gt;Custom messages&lt;/p&gt;
   &lt;/div&gt;
 <mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
+						</micro-lighter>
 						<div class="demo">
 							<iframe
 								src="custom-text.html"
@@ -198,11 +249,21 @@
 						selecting text while pulling down to see the difference.
 					</p>
 					<div class="code-demo-pair">
-						<pre><code><mark>&lt;pull-to-refresh disable-selection&gt;</mark>
+						<micro-lighter
+							class="code-panel"
+							language="html"
+							controls="copy"
+							data-label="HTML"
+						>
+							<pre
+								aria-label="Using disable-selection Attribute code 4"
+								tabindex="0"
+							><code><mark>&lt;pull-to-refresh disable-selection&gt;</mark>
   &lt;div class="content"&gt;
     &lt;p&gt;Selection blocked during pull&lt;/p&gt;
   &lt;/div&gt;
 <mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
+						</micro-lighter>
 						<div class="demo">
 							<iframe
 								src="selection-disabled.html"
@@ -232,11 +293,21 @@
 						Using the <code><mark>lang="es"</mark></code> attribute.
 					</p>
 					<div class="code-demo-pair">
-						<pre><code><mark>&lt;pull-to-refresh lang="es"&gt;</mark>
+						<micro-lighter
+							class="code-panel"
+							language="html"
+							controls="copy"
+							data-label="HTML"
+						>
+							<pre
+								aria-label="Spanish (Español) code 5"
+								tabindex="0"
+							><code><mark>&lt;pull-to-refresh lang="es"&gt;</mark>
   &lt;div class="content"&gt;
     &lt;p&gt;Contenido en español&lt;/p&gt;
   &lt;/div&gt;
 <mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
+						</micro-lighter>
 						<div class="demo">
 							<iframe
 								src="spanish.html"
@@ -258,11 +329,21 @@
 						Using the <code><mark>lang="fr"</mark></code> attribute.
 					</p>
 					<div class="code-demo-pair">
-						<pre><code><mark>&lt;pull-to-refresh lang="fr"&gt;</mark>
+						<micro-lighter
+							class="code-panel"
+							language="html"
+							controls="copy"
+							data-label="HTML"
+						>
+							<pre
+								aria-label="French (Français) code 6"
+								tabindex="0"
+							><code><mark>&lt;pull-to-refresh lang="fr"&gt;</mark>
   &lt;div class="content"&gt;
     &lt;p&gt;Contenu en français&lt;/p&gt;
   &lt;/div&gt;
 <mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
+						</micro-lighter>
 						<div class="demo">
 							<iframe
 								src="french.html"
@@ -284,11 +365,21 @@
 						Using the <code><mark>lang="ja"</mark></code> attribute.
 					</p>
 					<div class="code-demo-pair">
-						<pre><code><mark>&lt;pull-to-refresh lang="ja"&gt;</mark>
+						<micro-lighter
+							class="code-panel"
+							language="html"
+							controls="copy"
+							data-label="HTML"
+						>
+							<pre
+								aria-label="Japanese (日本語) code 7"
+								tabindex="0"
+							><code><mark>&lt;pull-to-refresh lang="ja"&gt;</mark>
   &lt;div class="content"&gt;
     &lt;p&gt;日本語のコンテンツ&lt;/p&gt;
   &lt;/div&gt;
 <mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
+						</micro-lighter>
 						<div class="demo">
 							<iframe
 								src="japanese.html"
@@ -437,5 +528,6 @@
 				>.
 			</p>
 		</footer>
+		<script type="module" src="./code-examples.js"></script>
 	</body>
 </html>
