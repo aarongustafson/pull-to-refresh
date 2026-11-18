@@ -8,10 +8,13 @@ test.beforeEach(async ({ page }) => {
 	);
 });
 
-const css = await readFile(
-	new URL('../../demo/styles.css', import.meta.url),
-	'utf8',
-);
+const css = (
+	await Promise.all(
+		['styles.css', 'demo-shell.css'].map((file) =>
+			readFile(new URL(`../../demo/${file}`, import.meta.url), 'utf8'),
+		),
+	)
+).join('\n');
 const source = await readFile(
 	new URL('../../pull-to-refresh.js', import.meta.url),
 	'utf8',
@@ -114,6 +117,36 @@ async function demo(page, name = 'basic') {
 		await expect(page.locator('.ptr-indicator')).toHaveCount(1);
 }
 
+for (const name of ['esm', 'unpkg']) {
+	test(`${name}: copied example enhances keyboard Refresh instead of reloading`, async ({
+		page,
+	}) => {
+		await demo(page, name);
+		const snippet = await page.locator('pre code').first().textContent();
+		await page.route('**/copied-example.html', (route) =>
+			route.fulfill({
+				contentType: 'text/html',
+				body: `<!doctype html><html lang="en"><title>Copied example</title><body>${snippet}</body></html>`,
+			}),
+		);
+		await page.goto('/copied-example.html');
+		await expect(page.locator('.ptr-indicator')).toHaveCount(1);
+		await page.evaluate(() => {
+			window.copiedRefreshes = 0;
+			document.addEventListener('ptr:refresh', () => {
+				window.copiedRefreshes += 1;
+			});
+		});
+		await page
+			.getByRole('button', { name: 'Refresh', exact: true })
+			.focus();
+		await page.keyboard.press('Enter');
+		await expect
+			.poll(() => page.evaluate(() => window.copiedRefreshes))
+			.toBe(1);
+	});
+}
+
 test('contrast calibration catches the former fixed-blue dark-scheme status', async ({
 	page,
 }) => {
@@ -155,7 +188,7 @@ test('all 19 study palettes retain reading, code, footer, hover and indicator co
 					.querySelector('.demo-content')
 					.insertAdjacentHTML(
 						'beforeend',
-						'<section class="demo-section">Reading <small>Supporting content</small><pre><code>Code</code></pre></section>',
+						'<section class="demo-section">Reading <small>Supporting content</small><micro-lighter class="code-panel" language="html" data-label="HTML"><pre><code>Code</code></pre></micro-lighter></section>',
 					);
 			},
 			{ css: substitute(css, palette), palette },

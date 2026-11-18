@@ -64,6 +64,14 @@ definePullToRefresh();
 document.addEventListener('ptr:refresh', (event) =&gt; {
   setTimeout(() =&gt; event.detail.complete(), 750);
 });
+
+document.addEventListener('submit', (event) =&gt; {
+  if (!event.target.matches('[data-refresh]')) return;
+  const component = document.querySelector('pull-to-refresh');
+  if (typeof <mark>component?.triggerRefresh</mark> !== 'function') return;
+  event.preventDefault();
+  if (!<mark>component.isRefreshing</mark>) <mark>component.triggerRefresh()</mark>;
+});
 &lt;/script&gt;
 <mark>&lt;pull-to-refresh&gt;</mark>
   &lt;p&gt;Pull down to refresh this content.&lt;/p&gt;
