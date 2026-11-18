@@ -4,7 +4,13 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>pull-to-refresh via unpkg</title>
+
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/microlighter@2.2.0/dist/themes/github.css"
+		/>
 		<link rel="stylesheet" href="./styles.css" />
+		<link rel="stylesheet" href="./demo-shell.css" />
 		<style>
 			pull-to-refresh {
 				display: block;
@@ -21,30 +27,89 @@
 			}
 		</style>
 	</head>
-	<body>
-		<pull-to-refresh>
-			<div class="content">
-				<h1>unpkg CDN sanity check</h1>
-				<p>
-					This page loads the guarded definition helper from
-					<code>unpkg</code> and registers the element when supported.
-				</p>
-				<p>
-					Pull down to trigger the refresh event. The handler
-					completes after a short timeout.
-				</p>
-			</div>
-		</pull-to-refresh>
-		<form data-refresh><button type="submit">Refresh</button></form>
-		<p>
-			If the CDN or JavaScript is unavailable, Refresh reloads the
-			document. Content remains available.
-		</p>
-		<noscript
-			><p>
-				JavaScript is off. Use Refresh to reload this page.
-			</p></noscript
-		>
+
+	<body data-syntax-theme="github">
+		<a class="skip-link" href="#main">Skip to examples</a>
+		<header>
+			<p class="eyebrow">Web component / unpkg</p>
+			<h1>&lt;pull-to-refresh&gt;</h1>
+			<p class="lede">Load the component from unpkg.</p>
+			<nav aria-label="Component resources">
+				<a
+					href="https://github.com/aarongustafson/pull-to-refresh/blob/main/README.md"
+					>Read the README</a
+				>
+				<a href="./index.html">All examples</a>
+			</nav>
+		</header>
+		<main id="main" tabindex="-1">
+			<p
+				id="microlighter-status"
+				class="enhancement-status"
+				role="status"
+				hidden
+			></p>
+			<section class="demo-section">
+				<h2>Automatic registration</h2>
+				<div class="code-demo-pair">
+					<micro-lighter
+						class="code-panel"
+						language="html"
+						controls="copy"
+						data-label="HTML + JavaScript"
+					>
+						<pre
+							tabindex="0"
+							aria-label="CDN refresh example code"
+						><code>&lt;script type="module"&gt;
+import { definePullToRefresh } from 'https://unpkg.com/@aarongustafson/pull-to-refresh@latest/define.js?module';
+
+definePullToRefresh();
+
+document.addEventListener('ptr:refresh', (event) =&gt; {
+  setTimeout(() =&gt; event.detail.complete(), 750);
+});
+&lt;/script&gt;
+<mark>&lt;pull-to-refresh&gt;</mark>
+  &lt;p&gt;Pull down to refresh this content.&lt;/p&gt;
+<mark>&lt;/pull-to-refresh&gt;</mark>
+&lt;form data-refresh&gt;
+  &lt;button type="submit"&gt;Refresh&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+					</micro-lighter>
+					<div class="demo">
+						<pull-to-refresh>
+							<div class="content">
+								<h3>unpkg CDN sanity check</h3>
+								<p>
+									This page loads the guarded definition
+									helper from
+									<code>unpkg</code> and registers the element
+									when supported.
+								</p>
+								<p>
+									Pull down to trigger the refresh event. The
+									handler completes after a short timeout.
+								</p>
+							</div>
+						</pull-to-refresh>
+						<form data-refresh>
+							<button type="submit">Refresh</button>
+						</form>
+						<p>
+							If the CDN or JavaScript is unavailable, Refresh
+							reloads the document. Content remains available.
+						</p>
+						<noscript
+							><p>
+								JavaScript is off. Use Refresh to reload this
+								page.
+							</p></noscript
+						>
+					</div>
+				</div>
+			</section>
+		</main>
 		<footer>
 			<p>
 				Made with ❤️ by
@@ -70,5 +135,6 @@
 				setTimeout(() => event.detail.complete(), 750);
 			});
 		</script>
+		<script type="module" src="./code-examples.js"></script>
 	</body>
 </html>

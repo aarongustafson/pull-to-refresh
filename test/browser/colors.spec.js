@@ -1,6 +1,13 @@
 import { readFile } from 'node:fs/promises';
 import { test, expect } from '@playwright/test';
 
+test.beforeEach(async ({ page }) => {
+	await page.route(
+		'https://cdn.jsdelivr.net/npm/microlighter@2.2.0/dist/**',
+		(route) => route.abort(),
+	);
+});
+
 const css = await readFile(
 	new URL('../../demo/styles.css', import.meta.url),
 	'utf8',
@@ -467,7 +474,13 @@ for (const mode of [
 		}
 		const generic = page.locator('code').filter({ hasText: /^en-US$/ });
 		await expect(generic.locator('mark')).toHaveCount(0);
-		await page.keyboard.press(browserName === 'webkit' ? 'Alt+Tab' : 'Tab');
+		const tab =
+			browserName === 'webkit' && process.platform === 'darwin'
+				? 'Alt+Tab'
+				: 'Tab';
+		await page.keyboard.press(tab);
+		await expect(page.locator('.skip-link')).toBeFocused();
+		await page.keyboard.press(tab);
 		await expect(
 			page
 				.locator('header')
