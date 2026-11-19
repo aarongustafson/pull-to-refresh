@@ -10,7 +10,9 @@ describe('demo surface contracts', () => {
 			/GrayText|ActiveText|SelectedItem|Highlight|AccentColor|opacity:\s*0\.8/,
 		);
 		expect(css).toMatch(/pre\s*\{[^}]*ButtonFace[^}]*ButtonText/s);
-		expect(css).toMatch(/\.demo-section\s*\{[^}]*Canvas[^}]*CanvasText/s);
+		expect(css).not.toMatch(
+			/\.demo-section\s*\{[^}]*(?:\bcolor|\bbackground(?:-[\w-]+)?):/,
+		);
 		const source = read('pull-to-refresh.js');
 		expect(source).toContain('var(--ptr-indicator-bg, ButtonFace)');
 		expect(source).toContain('var(--ptr-indicator-color, ButtonText)');
