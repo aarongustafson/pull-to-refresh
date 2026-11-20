@@ -1,0 +1,85 @@
+input[type='checkbox'],
+input[type='radio'] {
+	margin: 0;
+	padding: 0;
+}
+
+html,
+body {
+	height: 100%;
+	background: Canvas;
+	color: CanvasText;
+	font-family:
+		-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+		Cantarell, sans-serif;
+}
+
+body {
+	line-height: 1.6;
+	max-width: 1400px;
+	margin: 0 auto;
+	padding: 1rem;
+	overflow-wrap: anywhere;
+}
+
+body:not([data-demo-variant='compact']) > pull-to-refresh {
+	height: 100%;
+}
+
+.demo-content {
+	padding: 20px;
+}
+
+body[data-demo-variant='compact'] .demo-content {
+	padding: 1rem;
+}
+
+.demo-content h3 {
+	font-family: inherit;
+	margin-top: 0;
+	margin-bottom: 1rem;
+}
+
+.status {
+	background: Canvas;
+	color: CanvasText;
+	border: 1px solid currentColor;
+	padding: 10px;
+	margin: 10px 0;
+	border-radius: 4px;
+	font-family: system-monospace, monospace;
+	font-size: 0.75rem;
+}
+
+.random-number {
+	font-weight: bold;
+	color: inherit;
+}
+
+.highlight {
+	background: Mark;
+	color: MarkText;
+	padding: 0.25rem 0.5rem;
+	border-radius: 4px;
+	display: inline-block;
+	margin-top: 0.5rem;
+}
+
+footer {
+	margin-block-start: 3rem;
+	padding-block-start: 2rem;
+	border-top: 2px solid currentColor;
+	color: CanvasText;
+	font-size: 0.9rem;
+}
+
+@supports (color: color-mix(in srgb, CanvasText 80%, Canvas)) {
+	@media (forced-colors: none) and (prefers-contrast: no-preference) {
+		footer {
+			color: color-mix(in srgb, CanvasText 80%, Canvas);
+		}
+		button:hover {
+			background: color-mix(in srgb, ButtonFace 95%, ButtonText);
+		}
+	}
+}

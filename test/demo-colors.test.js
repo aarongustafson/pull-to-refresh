@@ -4,12 +4,20 @@ import { describe, expect, it } from 'vitest';
 const read = (file) => readFileSync(file, 'utf8');
 
 describe('demo surface contracts', () => {
+	it('trims block-edge margins inside demo sections', () => {
+		expect(read('demo/demo-shell.css')).toMatch(
+			/\.demo-section(?:,\s*\.api-reference)?\s*\{[^}]*\bmargin-trim:\s*block;/,
+		);
+	});
+
 	it('keeps purposeful reading, code, and indicator pairs', () => {
 		const css = read('demo/styles.css');
 		expect(css).not.toMatch(
 			/GrayText|ActiveText|SelectedItem|Highlight|AccentColor|opacity:\s*0\.8/,
 		);
-		expect(css).toMatch(/pre\s*\{[^}]*ButtonFace[^}]*ButtonText/s);
+		expect(read('demo/demo-shell.css')).toMatch(
+			/pre,\s*\.event-log\s*\{[^}]*background-image:\s*linear-gradient\(Field,\s*Field\);[^}]*color:\s*FieldText;/s,
+		);
 		expect(css).not.toMatch(
 			/\.demo-section\s*\{[^}]*(?:\bcolor|\bbackground(?:-[\w-]+)?):/,
 		);
