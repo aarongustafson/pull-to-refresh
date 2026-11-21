@@ -4,52 +4,10 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>Pull-to-refresh Web Component Demo</title>
-		<link rel="stylesheet" href="./styles.css" />
 		<link rel="stylesheet" href="./demo-shell.css" />
-		<style>
-			/* Demo-specific styles */
-			body {
-				margin: 0;
-			}
-
-			.demo {
-				background: Canvas;
-				color: CanvasText;
-				border: 1px solid;
-				border-radius: 4px;
-				overflow: hidden;
-			}
-
-			.demo iframe {
-				width: 100%;
-				height: 420px;
-				border: none;
-				display: block;
-			}
-
-			.demo-link {
-				display: block;
-				padding: 8px 12px;
-				text-align: center;
-				background: Canvas;
-				border-top: 1px solid;
-				color: LinkText;
-				text-decoration: underline;
-				font-size: 0.875rem;
-				transition: background 0.2s;
-			}
-
-			.demo-link:hover {
-				text-decoration-thickness: 0.15em;
-			}
-
-			.demo-link::after {
-				content: ' ↗';
-				font-size: 0.75rem;
-			}
-		</style>
+		<link rel="stylesheet" href="./styles.css" />
 	</head>
-	<body data-syntax-theme="github">
+	<body data-syntax-theme="github" data-demo-page="full">
 		<a class="skip-link" href="#main">Skip to examples</a>
 		<header>
 			<p class="eyebrow">Web component / Examples</p>
@@ -79,6 +37,9 @@
 		<main id="main" tabindex="-1">
 			<p
 				id="microlighter-status"
+				data-loading-message="Loading optional code highlighting…"
+				data-failure-message="Code remains readable and selectable. Optional highlighting and Copy controls could not load."
+				data-theme-failure-message="Code highlighting and Copy controls are available, but the syntax theme could not load."
 				class="enhancement-status"
 				role="status"
 				hidden
@@ -110,7 +71,7 @@
 					<h3>Basic Usage</h3>
 					<p>
 						The component listens for pull gestures and fires a
-						<code><mark>ptr:refresh</mark></code> event.
+						<code>ptr:refresh</code> event.
 					</p>
 					<div class="code-demo-pair">
 						<micro-lighter
@@ -130,7 +91,7 @@
   &lt;/div&gt;
 <mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
 						</micro-lighter>
-						<div class="demo">
+						<div class="demo" data-demo-label="Live example">
 							<iframe
 								src="basic.html"
 								title="Basic pull-to-refresh demo"
@@ -173,7 +134,7 @@
   &lt;/div&gt;
 <mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
 						</micro-lighter>
-						<div class="demo">
+						<div class="demo" data-demo-label="Live example">
 							<iframe
 								src="threshold.html"
 								title="Custom threshold pull-to-refresh demo"
@@ -216,7 +177,7 @@
   &lt;/div&gt;
 <mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
 						</micro-lighter>
-						<div class="demo">
+						<div class="demo" data-demo-label="Live example">
 							<iframe
 								src="custom-text.html"
 								title="Custom text pull-to-refresh demo"
@@ -238,8 +199,8 @@
 				<p>
 					By default, text selection is allowed during pull gestures.
 					Use the
-					<code><mark>disable-selection</mark></code> attribute to
-					prevent accidental text selection while pulling.
+					<code>disable-selection</code> attribute to prevent
+					accidental text selection while pulling.
 				</p>
 
 				<div class="demo-section">
@@ -264,7 +225,7 @@
   &lt;/div&gt;
 <mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
 						</micro-lighter>
-						<div class="demo">
+						<div class="demo" data-demo-label="Live example">
 							<iframe
 								src="selection-disabled.html"
 								title="Disabled text selection pull-to-refresh demo"
@@ -289,9 +250,7 @@
 
 				<div class="demo-section">
 					<h3>Spanish (Español)</h3>
-					<p>
-						Using the <code><mark>lang="es"</mark></code> attribute.
-					</p>
+					<p>Using the <code>lang="es"</code> attribute.</p>
 					<div class="code-demo-pair">
 						<micro-lighter
 							class="code-panel"
@@ -308,7 +267,7 @@
   &lt;/div&gt;
 <mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
 						</micro-lighter>
-						<div class="demo">
+						<div class="demo" data-demo-label="Live example">
 							<iframe
 								src="spanish.html"
 								title="Spanish pull-to-refresh demo"
@@ -325,9 +284,7 @@
 
 				<div class="demo-section">
 					<h3>French (Français)</h3>
-					<p>
-						Using the <code><mark>lang="fr"</mark></code> attribute.
-					</p>
+					<p>Using the <code>lang="fr"</code> attribute.</p>
 					<div class="code-demo-pair">
 						<micro-lighter
 							class="code-panel"
@@ -344,7 +301,7 @@
   &lt;/div&gt;
 <mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
 						</micro-lighter>
-						<div class="demo">
+						<div class="demo" data-demo-label="Live example">
 							<iframe
 								src="french.html"
 								title="French pull-to-refresh demo"
@@ -361,9 +318,7 @@
 
 				<div class="demo-section">
 					<h3>Japanese (日本語)</h3>
-					<p>
-						Using the <code><mark>lang="ja"</mark></code> attribute.
-					</p>
+					<p>Using the <code>lang="ja"</code> attribute.</p>
 					<div class="code-demo-pair">
 						<micro-lighter
 							class="code-panel"
@@ -380,7 +335,7 @@
   &lt;/div&gt;
 <mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
 						</micro-lighter>
-						<div class="demo">
+						<div class="demo" data-demo-label="Live example">
 							<iframe
 								src="japanese.html"
 								title="Japanese pull-to-refresh demo"
@@ -431,80 +386,78 @@
 				<h3>Attributes</h3>
 				<ul>
 					<li>
-						<code><mark>threshold</mark></code> - Distance in pixels
-						to trigger refresh (default: 80)
+						<code>threshold</code> - Distance in pixels to trigger
+						refresh (default: 80)
 					</li>
 					<li>
-						<code><mark>indicator-text</mark></code> - Text when
-						pulling (default: localized "↓ Pull to refresh")
+						<code>indicator-text</code> - Text when pulling
+						(default: localized "↓ Pull to refresh")
 					</li>
 					<li>
-						<code><mark>release-text</mark></code> - Text when ready
-						to release (default: localized "↻ Release to refresh")
+						<code>release-text</code> - Text when ready to release
+						(default: localized "↻ Release to refresh")
 					</li>
 					<li>
-						<code><mark>refreshing-text</mark></code> - Text while
-						refreshing (default: localized "⏳ Refreshing...")
+						<code>refreshing-text</code> - Text while refreshing
+						(default: localized "⏳ Refreshing...")
 					</li>
 					<li>
-						<code><mark>lang</mark></code> - Language code for
-						localization (auto-detected from element, ancestor, or
-						document)
+						<code>lang</code> - Language code for localization
+						(auto-detected from element, ancestor, or document)
 					</li>
 					<li>
-						<code><mark>disabled</mark></code> - Disables
-						pull-to-refresh functionality
+						<code>disabled</code> - Disables pull-to-refresh
+						functionality
 					</li>
 					<li>
-						<code><mark>disable-selection</mark></code> - Prevents
-						text selection during pull gesture
+						<code>disable-selection</code> - Prevents text selection
+						during pull gesture
 					</li>
 				</ul>
 				<h3>Events</h3>
 				<ul>
 					<li>
-						<code><mark>ptr:pull-start</mark></code> - Fired when
-						pull gesture starts
+						<code>ptr:pull-start</code> - Fired when pull gesture
+						starts
 					</li>
 					<li>
-						<code><mark>ptr:pull-move</mark></code> - Fired during
-						pull (detail contains distance)
+						<code>ptr:pull-move</code> - Fired during pull (detail
+						contains distance)
 					</li>
 					<li>
-						<code><mark>ptr:pull-end</mark></code> - Fired when pull
-						gesture ends
+						<code>ptr:pull-end</code> - Fired when pull gesture ends
 					</li>
 					<li>
-						<code><mark>ptr:refresh</mark></code> - Fired when
-						refresh is triggered
+						<code>ptr:refresh</code> - Fired when refresh is
+						triggered
 					</li>
 					<li>
-						<code><mark>ptr:refresh-complete</mark></code> - Fired
-						when refresh completes
+						<code>ptr:refresh-complete</code> - Fired when refresh
+						completes
 					</li>
 				</ul>
 
 				<h3>CSS Custom Properties</h3>
 				<ul>
 					<li>
-						<code><mark>--ptr-indicator-height</mark></code> -
-						Height of indicator (default: 3.125rem)
+						<code>--ptr-indicator-height</code> - Height of
+						indicator (default: 3.125rem)
 					</li>
 					<li>
-						<code><mark>--ptr-indicator-bg</mark></code> - Indicator
-						background (default: ButtonFace)
+						<code>--ptr-indicator-bg</code> - Indicator background
+						(default: ButtonFace)
 					</li>
 					<li>
-						<code><mark>--ptr-indicator-color</mark></code> -
-						Indicator text color (default: ButtonText)
+						<code>--ptr-indicator-color</code> - Indicator text
+						color (default: ButtonText)
 					</li>
 					<li>
-						<code><mark>--ptr-indicator-font-size</mark></code> -
-						Indicator font size (default: 0.875rem)
+						<code>--ptr-indicator-font-size</code> - Indicator font
+						size (default: 0.875rem)
 					</li>
 					<li>
-						<code><mark>--ptr-transition-duration</mark></code> -
-						Transition duration (default: 0.2s)
+						<code>--ptr-transition-duration</code> - Transition
+						duration (default: 0.2s)
 					</li>
 				</ul>
 

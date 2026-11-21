@@ -1,0 +1,12 @@
+{
+	"index.html": "full",
+	"esm.html": "full",
+	"unpkg.html": "full",
+	"basic.html": "embedded",
+	"custom-text.html": "embedded",
+	"threshold.html": "embedded",
+	"selection-disabled.html": "embedded",
+	"french.html": "embedded",
+	"spanish.html": "embedded",
+	"japanese.html": "embedded"
+}

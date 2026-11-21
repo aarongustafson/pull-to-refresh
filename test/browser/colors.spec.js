@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { test, expect } from '@playwright/test';
+import { expectNativeFocus, readDemoStyles } from './demo-fixture.js';
 
 test.beforeEach(async ({ page }) => {
 	await page.route(
@@ -8,13 +9,7 @@ test.beforeEach(async ({ page }) => {
 	);
 });
 
-const css = (
-	await Promise.all(
-		['styles.css', 'demo-shell.css'].map((file) =>
-			readFile(new URL(`../../demo/${file}`, import.meta.url), 'utf8'),
-		),
-	)
-).join('\n');
+const css = await readDemoStyles('basic.html');
 const source = await readFile(
 	new URL('../../pull-to-refresh.js', import.meta.url),
 	'utf8',
@@ -284,11 +279,10 @@ test('native keyboard focus and localized loading/completion keep focus and data
 	await expect(
 		page.getByRole('button', { name: 'Actualiser' }),
 	).toBeFocused();
+	await expectNativeFocus(page.getByRole('button', { name: 'Actualiser' }));
 	expect(
-		await page
-			.locator('button')
-			.evaluate((button) => getComputedStyle(button).outlineStyle),
-	).not.toBe('none');
+		(await page.locator('button').boundingBox()).height,
+	).toBeGreaterThanOrEqual(44);
 	await page.keyboard.press('Enter');
 	await expect(page.locator('#status')).toHaveText('Actualisation...');
 	await expect(page.locator('#status')).toContainText('Terminé');
@@ -391,9 +385,11 @@ test('320px reflow and enlarged text keep code left/live right only at wide widt
 			),
 		).toBe(true);
 		const pair = page.locator('.code-demo-pair').first();
-		expect(
-			await pair.evaluate((node) => getComputedStyle(node).flexDirection),
-		).toBe(width === 320 ? 'column' : 'row');
+		const code = await pair.locator(':scope > micro-lighter').boundingBox();
+		const live = await pair.locator(':scope > .demo').boundingBox();
+		if (width === 320)
+			expect(live.y).toBeGreaterThanOrEqual(code.y + code.height);
+		else expect(live.x).toBeGreaterThanOrEqual(code.x + code.width);
 	}
 });
 
@@ -467,7 +463,7 @@ for (const mode of [
 	{ name: 'dark', colorScheme: 'dark', forcedColors: 'none' },
 	{ name: 'forced', colorScheme: 'light', forcedColors: 'active' },
 ]) {
-	test(`${mode.name}: inline and block component marks remain readable without changing generic code or navigation`, async ({
+	test(`${mode.name}: authored code retains contrast and page navigation`, async ({
 		page,
 		browserName,
 	}) => {
@@ -480,12 +476,9 @@ for (const mode of [
 			forcedColors: mode.forcedColors,
 		});
 		await demo(page, 'index');
-		await expect(page.locator('code mark')).toHaveCount(36);
-		await expect(page.locator('pre code mark')).toHaveCount(14);
-		await expect(page.locator('mark mark')).toHaveCount(0);
-		const inline = page.locator('.api-reference code mark').first();
+		const inline = page.locator('.api-reference code').first();
 		const block = page.locator('pre code mark').first();
-		for (const mark of [inline, block]) {
+		for (const mark of [block]) {
 			expect(await contrast(mark)).toBeGreaterThanOrEqual(4.5);
 			expect(
 				await mark.evaluate((node) => {
@@ -505,8 +498,7 @@ for (const mode of [
 				}),
 			).toBe(true);
 		}
-		const generic = page.locator('code').filter({ hasText: /^en-US$/ });
-		await expect(generic.locator('mark')).toHaveCount(0);
+		expect(await contrast(inline)).toBeGreaterThanOrEqual(4.5);
 		const tab =
 			browserName === 'webkit' && process.platform === 'darwin'
 				? 'Alt+Tab'
