@@ -9,30 +9,41 @@
 		<link rel="stylesheet" href="./embedded.css" />
 	</head>
 	<body data-demo-page="embedded">
-		<pull-to-refresh
-			id="demo"
-			indicator-text="⬇ Swipe down"
-			release-text="🔄 Let go!"
-			refreshing-text="⏳ Loading..."
-		>
-			<div class="demo-content">
-				<h3>Custom Messages</h3>
-				<p>Notice the different indicator text.</p>
-				<p>
-					Random number:
-					<span class="random-number" id="random">0</span>
-				</p>
-				<div class="status" id="status" role="status">Ready</div>
-				<form data-refresh><button type="submit">Refresh</button></form>
-				<p>The Refresh button reloads the page if enhancement fails.</p>
-				<noscript
-					><p>
-						JavaScript is off. Content remains available; use
-						Refresh to reload.
-					</p></noscript
-				>
-			</div>
-		</pull-to-refresh>
+		<section id="custom-messages-refresh">
+			<pull-to-refresh
+				id="demo"
+				indicator-text="↓ Pull to check for updates"
+				release-text="↻ Release to check"
+				refreshing-text="⏳ Checking for updates..."
+			>
+				<div class="demo-content">
+					<h3>Custom Messages</h3>
+					<p>The indicator uses “check for updates” vocabulary.</p>
+					<p>
+						Random number:
+						<span class="random-number" id="random">0</span>
+					</p>
+					<div class="status" id="status" role="status">Ready</div>
+					<label
+						><input type="checkbox" id="fail-refresh" /> Simulate a
+						failed refresh</label
+					>
+					<form data-refresh>
+						<button type="submit">Refresh</button>
+					</form>
+					<p>
+						The Refresh button reloads the page if enhancement
+						fails.
+					</p>
+					<noscript
+						><p>
+							JavaScript is off. Content remains available; use
+							Refresh to reload.
+						</p></noscript
+					>
+				</div>
+			</pull-to-refresh>
+		</section>
 		<footer>
 			<p>
 				Made with ❤️ by
@@ -54,17 +65,32 @@
 			const demo = document.getElementById('demo');
 			const random = document.getElementById('random');
 			const status = document.getElementById('status');
+			let pending = false;
 
-			demo.addEventListener('ptr:refresh', (e) => {
+			demo.addEventListener('ptr:refresh', async (event) => {
+				if (pending) {
+					event.detail.complete();
+					return;
+				}
+				pending = true;
 				status.textContent = 'Refreshing...';
-				setTimeout(() => {
-					random.textContent = Math.floor(Math.random() * 1000);
-					e.detail.complete();
-				}, 1500);
-			});
-
-			demo.addEventListener('ptr:refresh-complete', () => {
-				status.textContent = 'Complete! Pull again to refresh.';
+				try {
+					await new Promise((resolve) => setTimeout(resolve, 1500));
+					const failure = document.getElementById('fail-refresh');
+					if (failure.checked) {
+						failure.checked = false;
+						throw new Error('Simulated refresh failure');
+					}
+					const nextNumber = Math.floor(Math.random() * 1000);
+					random.textContent = nextNumber;
+					status.textContent = 'Complete! Use Refresh or pull again.';
+				} catch {
+					status.textContent =
+						'Refresh failed. Your previous number is unchanged. Use Refresh to try again.';
+				} finally {
+					pending = false;
+					event.detail.complete();
+				}
 			});
 		</script>
 	</body>

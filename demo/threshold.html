@@ -9,25 +9,32 @@
 		<link rel="stylesheet" href="./embedded.css" />
 	</head>
 	<body data-demo-page="embedded">
-		<pull-to-refresh id="demo" threshold="120">
-			<div class="demo-content">
-				<h3>Custom Threshold (120px)</h3>
-				<p>Pull down further to trigger refresh.</p>
-				<p>
-					Random number:
-					<span class="random-number" id="random">0</span>
-				</p>
-				<div class="status" id="status" role="status">Ready</div>
-				<form data-refresh><button type="submit">Refresh</button></form>
-				<p>The Refresh button reloads the page if enhancement fails.</p>
-				<noscript
-					><p>
-						JavaScript is off. Content remains available; use
-						Refresh to reload.
-					</p></noscript
-				>
-			</div>
-		</pull-to-refresh>
+		<section id="longer-pull-refresh">
+			<pull-to-refresh id="demo" threshold="120">
+				<div class="demo-content">
+					<h3>Custom Threshold (120px)</h3>
+					<p>Pull down further to trigger refresh.</p>
+					<p>
+						Random number:
+						<span class="random-number" id="random">0</span>
+					</p>
+					<div class="status" id="status" role="status">Ready</div>
+					<form data-refresh>
+						<button type="submit">Refresh</button>
+					</form>
+					<p>
+						The Refresh button reloads the page if enhancement
+						fails.
+					</p>
+					<noscript
+						><p>
+							JavaScript is off. Content remains available; use
+							Refresh to reload.
+						</p></noscript
+					>
+				</div>
+			</pull-to-refresh>
+		</section>
 		<footer>
 			<p>
 				Made with ❤️ by
@@ -53,13 +60,17 @@
 			demo.addEventListener('ptr:refresh', (e) => {
 				status.textContent = 'Refreshing...';
 				setTimeout(() => {
-					random.textContent = Math.floor(Math.random() * 1000);
-					e.detail.complete();
+					try {
+						random.textContent = Math.floor(Math.random() * 1000);
+						status.textContent =
+							'Complete! Use Refresh or pull again.';
+					} catch {
+						status.textContent =
+							'Refresh failed. Your previous number is unchanged. Use Refresh to try again.';
+					} finally {
+						e.detail.complete();
+					}
 				}, 1500);
-			});
-
-			demo.addEventListener('ptr:refresh-complete', () => {
-				status.textContent = 'Complete! Pull again to refresh.';
 			});
 		</script>
 	</body>

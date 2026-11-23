@@ -36,8 +36,15 @@
 				role="status"
 				hidden
 			></p>
-			<section class="demo-section">
+			<section class="demo-section" id="unpkg-auto-registration">
 				<h2>Automatic registration</h2>
+				<p>
+					Import <code>define.js</code> from unpkg to register the
+					element automatically. The application handler shows loading
+					and completion; it doesn’t fetch data. Use the native
+					Refresh button with a keyboard. Without JavaScript or a
+					working CDN, its form reloads the document.
+				</p>
 				<div class="code-demo-pair">
 					<micro-lighter
 						class="code-panel"
@@ -49,12 +56,15 @@
 							tabindex="0"
 							aria-label="CDN refresh example code"
 						><code>&lt;script type="module"&gt;
-import { definePullToRefresh } from 'https://unpkg.com/@aarongustafson/pull-to-refresh@latest/define.js?module';
+<mark>import 'https://unpkg.com/@aarongustafson/pull-to-refresh@latest/define.js?module';</mark>
 
-definePullToRefresh();
-
-document.addEventListener('ptr:refresh', (event) =&gt; {
-  setTimeout(() =&gt; event.detail.complete(), 750);
+document.addEventListener(<mark>'ptr:refresh'</mark>, (event) =&gt; {
+  const status = document.getElementById('status');
+  status.textContent = 'Refreshing...';
+  setTimeout(() =&gt; {
+    status.textContent = 'Complete! Use Refresh or pull again.';
+    <mark>event.detail.complete()</mark>;
+  }, 750);
 });
 
 document.addEventListener('submit', (event) =&gt; {
@@ -68,6 +78,7 @@ document.addEventListener('submit', (event) =&gt; {
 <mark>&lt;pull-to-refresh&gt;</mark>
   &lt;p&gt;Pull down to refresh this content.&lt;/p&gt;
 <mark>&lt;/pull-to-refresh&gt;</mark>
+&lt;p id="status" role="status"&gt;Ready&lt;/p&gt;
 &lt;form data-refresh&gt;
   &lt;button type="submit"&gt;Refresh&lt;/button&gt;
 &lt;/form&gt;</code></pre>
@@ -75,7 +86,7 @@ document.addEventListener('submit', (event) =&gt; {
 					<div class="demo" data-demo-label="Live example">
 						<pull-to-refresh>
 							<div class="content">
-								<h3>unpkg CDN sanity check</h3>
+								<h3>Refresh with unpkg</h3>
 								<p>
 									This page loads the guarded definition
 									helper from
@@ -88,6 +99,7 @@ document.addEventListener('submit', (event) =&gt; {
 								</p>
 							</div>
 						</pull-to-refresh>
+						<p id="status" role="status">Ready</p>
 						<form data-refresh>
 							<button type="submit">Refresh</button>
 						</form>
@@ -122,12 +134,15 @@ document.addEventListener('submit', (event) =&gt; {
 		<script src="./refresh.js" type="module"></script>
 
 		<script type="module">
-			import { definePullToRefresh } from 'https://unpkg.com/@aarongustafson/pull-to-refresh@latest/define.js?module';
-
-			definePullToRefresh();
+			import 'https://unpkg.com/@aarongustafson/pull-to-refresh@latest/define.js?module';
 
 			document.addEventListener('ptr:refresh', (event) => {
-				setTimeout(() => event.detail.complete(), 750);
+				const status = document.getElementById('status');
+				status.textContent = 'Refreshing...';
+				setTimeout(() => {
+					status.textContent = 'Complete! Use Refresh or pull again.';
+					event.detail.complete();
+				}, 750);
 			});
 		</script>
 		<script type="module" src="./code-examples.js"></script>

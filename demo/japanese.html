@@ -3,33 +3,37 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Japanese Pull-to-Refresh Demo</title>
+		<title>引っ張って更新するデモ</title>
 		<link rel="stylesheet" href="./demo-shell.css" />
 		<link rel="stylesheet" href="./styles.css" />
 		<link rel="stylesheet" href="./embedded.css" />
 	</head>
 	<body data-demo-page="embedded">
-		<pull-to-refresh id="demo">
-			<div class="demo-content">
-				<h3>日本語のコンテンツ</h3>
-				<p>メッセージが日本語で表示されます。</p>
-				<p>
-					ランダム番号:
-					<span class="random-number" id="random">0</span>
-				</p>
-				<div class="status" id="status" role="status">準備完了</div>
-				<form data-refresh><button type="submit">更新</button></form>
-				<p>
-					機能を読み込めない場合、このボタンでページを再読み込みできます。
-				</p>
-				<noscript
-					><p>
-						JavaScript
-						は無効です。コンテンツは引き続き利用できます。「更新」で再読み込みしてください。
-					</p></noscript
-				>
-			</div>
-		</pull-to-refresh>
+		<section id="japanese-refresh">
+			<pull-to-refresh id="demo">
+				<div class="demo-content">
+					<h3>日本語のコンテンツ</h3>
+					<p>メッセージが日本語で表示されます。</p>
+					<p>
+						ランダム番号:
+						<span class="random-number" id="random">0</span>
+					</p>
+					<div class="status" id="status" role="status">準備完了</div>
+					<form data-refresh>
+						<button type="submit">更新</button>
+					</form>
+					<p>
+						機能を読み込めない場合、このボタンでページを再読み込みできます。
+					</p>
+					<noscript
+						><p>
+							JavaScript
+							は無効です。コンテンツは引き続き利用できます。「更新」で再読み込みしてください。
+						</p></noscript
+					>
+				</div>
+			</pull-to-refresh>
+		</section>
 		<footer>
 			<p>
 				制作 ❤️
@@ -55,14 +59,17 @@
 			demo.addEventListener('ptr:refresh', (e) => {
 				status.textContent = '更新中...';
 				setTimeout(() => {
-					random.textContent = Math.floor(Math.random() * 1000);
-					e.detail.complete();
+					try {
+						random.textContent = Math.floor(Math.random() * 1000);
+						status.textContent =
+							'完了！「更新」またはもう一度引っ張って更新してください。';
+					} catch {
+						status.textContent =
+							'更新に失敗しました。前の番号は変わりません。「更新」で再試行してください。';
+					} finally {
+						e.detail.complete();
+					}
 				}, 1500);
-			});
-
-			demo.addEventListener('ptr:refresh-complete', () => {
-				status.textContent =
-					'完了！もう一度引っ張って更新してください。';
 			});
 		</script>
 	</body>

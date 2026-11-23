@@ -9,29 +9,36 @@
 		<link rel="stylesheet" href="./embedded.css" />
 	</head>
 	<body data-demo-page="embedded" data-demo-variant="compact">
-		<pull-to-refresh id="demo" disable-selection>
-			<div class="demo-content">
-				<h3>With disable-selection</h3>
-				<p>
-					Try selecting this text while pulling down. Selection is
-					blocked during the pull gesture to prevent accidents.
-				</p>
-				<p class="highlight">
-					🚫 Selection blocked during pull gesture
-				</p>
-				<form data-refresh><button type="submit">Refresh</button></form>
-				<p>The Refresh button reloads the page if enhancement fails.</p>
-				<noscript
-					><p>
-						JavaScript is off. Selection and content remain
-						available; use Refresh to reload.
-					</p></noscript
-				>
-				<div class="status" id="status" role="status">
-					Pull down to refresh (selection disabled during pull)
+		<section id="selection-restoration-refresh">
+			<pull-to-refresh id="demo" disable-selection>
+				<div class="demo-content">
+					<h3>With disable-selection</h3>
+					<p>
+						Try selecting this text while pulling down. Selection is
+						blocked during a confirmed pull and restored on release.
+					</p>
+					<p class="highlight">
+						🚫 Selection blocked during pull gesture
+					</p>
+					<form data-refresh>
+						<button type="submit">Refresh</button>
+					</form>
+					<p>
+						The Refresh button reloads the page if enhancement
+						fails.
+					</p>
+					<noscript
+						><p>
+							JavaScript is off. Selection and content remain
+							available; use Refresh to reload.
+						</p></noscript
+					>
+					<div class="status" id="status" role="status">
+						Pull down to refresh (selection disabled during pull)
+					</div>
 				</div>
-			</div>
-		</pull-to-refresh>
+			</pull-to-refresh>
+		</section>
 		<footer>
 			<p>
 				Made with ❤️ by
@@ -56,16 +63,10 @@
 			demo.addEventListener('ptr:refresh', (e) => {
 				status.textContent = 'Refreshing...';
 				setTimeout(() => {
+					status.textContent =
+						'Complete! Selection is available again.';
 					e.detail.complete();
 				}, 1000);
-			});
-
-			demo.addEventListener('ptr:refresh-complete', () => {
-				status.textContent = 'Complete! (selection was disabled)';
-				setTimeout(() => {
-					status.textContent =
-						'Pull down to refresh (selection disabled during pull)';
-				}, 2000);
 			});
 		</script>
 	</body>

@@ -3,33 +3,38 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Spanish Pull-to-Refresh Demo</title>
+		<title>Actualizar al deslizar</title>
 		<link rel="stylesheet" href="./demo-shell.css" />
 		<link rel="stylesheet" href="./styles.css" />
 		<link rel="stylesheet" href="./embedded.css" />
 	</head>
 	<body data-demo-page="embedded">
-		<pull-to-refresh id="demo">
-			<div class="demo-content">
-				<h3>Contenido en Español</h3>
-				<p>Los mensajes aparecen en español.</p>
-				<p>
-					Número aleatorio:
-					<span class="random-number" id="random">0</span>
-				</p>
-				<div class="status" id="status" role="status">Listo</div>
-				<form data-refresh>
-					<button type="submit">Actualizar</button>
-				</form>
-				<p>Si la mejora falla, este botón vuelve a cargar la página.</p>
-				<noscript
-					><p>
-						JavaScript está desactivado. El contenido sigue
-						disponible; use Actualizar para recargar.
-					</p></noscript
-				>
-			</div>
-		</pull-to-refresh>
+		<section id="spanish-refresh">
+			<pull-to-refresh id="demo">
+				<div class="demo-content">
+					<h3>Contenido en Español</h3>
+					<p>Los mensajes aparecen en español.</p>
+					<p>
+						Número aleatorio:
+						<span class="random-number" id="random">0</span>
+					</p>
+					<div class="status" id="status" role="status">Listo</div>
+					<form data-refresh>
+						<button type="submit">Actualizar</button>
+					</form>
+					<p>
+						Si la mejora falla, este botón vuelve a cargar la
+						página.
+					</p>
+					<noscript
+						><p>
+							JavaScript está desactivado. El contenido sigue
+							disponible; use Actualizar para recargar.
+						</p></noscript
+					>
+				</div>
+			</pull-to-refresh>
+		</section>
 		<footer>
 			<p>
 				Creado con ❤️ por
@@ -55,14 +60,17 @@
 			demo.addEventListener('ptr:refresh', (e) => {
 				status.textContent = 'Actualizando...';
 				setTimeout(() => {
-					random.textContent = Math.floor(Math.random() * 1000);
-					e.detail.complete();
+					try {
+						random.textContent = Math.floor(Math.random() * 1000);
+						status.textContent =
+							'¡Completo! Use Actualizar o deslice de nuevo.';
+					} catch {
+						status.textContent =
+							'No se pudo actualizar. El número anterior no ha cambiado. Use Actualizar para volver a intentarlo.';
+					} finally {
+						e.detail.complete();
+					}
 				}, 1500);
-			});
-
-			demo.addEventListener('ptr:refresh-complete', () => {
-				status.textContent =
-					'¡Completo! Desliza de nuevo para actualizar.';
 			});
 		</script>
 	</body>

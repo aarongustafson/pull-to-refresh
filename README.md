@@ -6,46 +6,33 @@
 [![License](https://img.shields.io/npm/l/@aarongustafson/pull-to-refresh)](https://github.com/aarongustafson/pull-to-refresh/blob/main/LICENSE)
 [![Type definitions](https://img.shields.io/npm/types/@aarongustafson/pull-to-refresh)](https://github.com/aarongustafson/pull-to-refresh/blob/main/pull-to-refresh.d.ts)
 
-A lightweight, customizable Web Component that adds pull-to-refresh functionality to your web applications. Perfect for mobile-first experiences and progressive web apps.
+`<pull-to-refresh>` adds a downward pull gesture to scrollable content. At the
+top of its scroll container, pulling past the threshold and releasing fires
+`ptr:refresh`. Your application loads data, updates content, and reports the
+result; the component doesn’t fetch data or reload the page.
 
-## Demo
+Supply a native Refresh button for keyboard use and a useful no-JavaScript
+alternative. The example below uses a form that reloads the document before
+enhancement or if registration fails. The component doesn’t create a button.
 
-[Live Demo](https://aarongustafson.github.io/pull-to-refresh/demo/) ([Source](./demo/index.html))
+## Demos
 
-### Additional Demos
+- [Live demo](https://aarongustafson.github.io/pull-to-refresh/demo/) ([source](./demo/index.html))
+- [esm.sh: manual registration](https://aarongustafson.github.io/pull-to-refresh/demo/esm.html) ([source](./demo/esm.html))
+- [unpkg: automatic registration](https://aarongustafson.github.io/pull-to-refresh/demo/unpkg.html) ([source](./demo/unpkg.html))
 
-- [esm.sh CDN](https://aarongustafson.github.io/pull-to-refresh/demo/esm.html) ([Source](./demo/esm.html)) - Loading from esm.sh
-- [unpkg CDN](https://aarongustafson.github.io/pull-to-refresh/demo/unpkg.html) ([Source](./demo/unpkg.html)) - Loading from unpkg
+The live demo covers [a basic handler](https://aarongustafson.github.io/pull-to-refresh/demo/#basic),
+[failure and retry](https://aarongustafson.github.io/pull-to-refresh/demo/#custom-text),
+[selection](https://aarongustafson.github.io/pull-to-refresh/demo/#disable-selection),
+and [translated examples](https://aarongustafson.github.io/pull-to-refresh/demo/#localization).
 
-## Features
+## Installation and registration
 
-- **Touch-optimized**: Smooth pull gesture with momentum and feedback
-- **Customizable**: Adjust threshold, text, and styling via attributes and CSS custom properties
-- **Event-driven**: Rich event API for complete control over the refresh lifecycle
-- **Accessible**: Semantic HTML and ARIA-friendly
-- **Framework-agnostic**: Works with any framework or vanilla JavaScript
-- **Lightweight**: No dependencies, just native Web Components
-- **Shadow DOM**: Encapsulated styles that won't leak
-- **TypeScript-ready**: Bundled definitions for editors and build tooling
-
-## TypeScript & Framework Support
-
-- Bundled `.d.ts` files describe both `PullToRefreshElement` and `definePullToRefresh`, so modern editors provide autocomplete without extra config.
-- Threshold/text/disabled props now reflect to attributes, keeping declarative templates in sync with imperative code.
-- `_upgradeProperty` preserves pre-upgrade assignments—handy for SSR, hydration, and framework wrappers.
-- Global `HTMLElementTagNameMap` augmentation lets TypeScript understand `document.querySelector('pull-to-refresh')` out of the box.
-
-## Quick Start
-
-### Installation
-
-```bash
+```sh
 npm install @aarongustafson/pull-to-refresh
 ```
 
-### Usage
-
-**Option 1: Manual registration**
+The main import exports the class without registering an element:
 
 ```javascript
 import { PullToRefreshElement } from '@aarongustafson/pull-to-refresh';
@@ -53,14 +40,17 @@ import { PullToRefreshElement } from '@aarongustafson/pull-to-refresh';
 customElements.define('pull-to-refresh', PullToRefreshElement);
 ```
 
-**Option 2: Auto-define (browser environments only)**
+You can register the class under another tag name; update your HTML to match.
+
+For automatic registration in a browser, import the guarded helper instead:
 
 ```javascript
 import '@aarongustafson/pull-to-refresh/define.js';
-// Registers <pull-to-refresh> when customElements is available
 ```
 
-Prefer to control when registration happens? Call the helper directly:
+Importing `define.js` also calls `definePullToRefresh()`. The helper skips an
+already registered tag and returns `true` when a registry is available, or
+`false` otherwise. Calling it explicitly doesn’t defer that initial registration:
 
 ```javascript
 import { definePullToRefresh } from '@aarongustafson/pull-to-refresh/define.js';
@@ -68,394 +58,262 @@ import { definePullToRefresh } from '@aarongustafson/pull-to-refresh/define.js';
 definePullToRefresh();
 ```
 
-You can also include the guarded script from HTML:
+You can also load `define.js` with a module script:
 
 ```html
 <script
-  src="./node_modules/@aarongustafson/pull-to-refresh/define.js"
   type="module"
+  src="./node_modules/@aarongustafson/pull-to-refresh/define.js"
 ></script>
 ```
 
-### Basic Example
+The class is also exported from
+`@aarongustafson/pull-to-refresh/pull-to-refresh.js`. Bundled
+[type declarations](./pull-to-refresh.d.ts) describe the public API.
+
+## Basic usage
+
+This complete example generates a number locally, so it doesn’t need an API.
+Serve it over HTTP with the installed package at the path shown. Replace the
+delayed update with your application’s work.
 
 ```html
-<pull-to-refresh>
-  <div class="content">
-    <h1>My Content</h1>
-    <p>Pull down from the top to refresh!</p>
-  </div>
+<pull-to-refresh id="refresh-content">
+  <h2>Latest number</h2>
+  <p>Number: <span id="number">0</span></p>
+  <p id="refresh-status" role="status">Ready</p>
+  <form id="refresh-form">
+    <button type="submit">Refresh</button>
+  </form>
 </pull-to-refresh>
 
 <script type="module">
-  import '@aarongustafson/pull-to-refresh';
+  import './node_modules/@aarongustafson/pull-to-refresh/define.js';
 
-  const ptr = document.querySelector('pull-to-refresh');
+  const component = document.getElementById('refresh-content');
+  const number = document.getElementById('number');
+  const status = document.getElementById('refresh-status');
+  const form = document.getElementById('refresh-form');
+  let pending = false;
 
-  ptr.addEventListener('ptr:refresh', (e) => {
-    // Perform your refresh logic (fetch data, etc.)
-    fetch('/api/data')
-      .then((response) => response.json())
-      .then((data) => {
-        // Update your content
-        updateContent(data);
-        // Signal completion
-        e.detail.complete();
-      });
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (!pending) component.triggerRefresh();
+  });
+
+  component.addEventListener('ptr:refresh', async (event) => {
+    if (pending) {
+      event.detail.complete();
+      return;
+    }
+    pending = true;
+    status.textContent = 'Refreshing...';
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const nextNumber = Math.floor(Math.random() * 1000);
+      number.textContent = nextNumber;
+      status.textContent = 'Complete! Use Refresh or pull again.';
+    } catch {
+      status.textContent =
+        'Refresh failed. Your previous number is unchanged. Use Refresh to try again.';
+    } finally {
+      pending = false;
+      event.detail.complete();
+    }
   });
 </script>
 ```
 
-## API
+The handler leaves the previous number visible while loading and on failure.
+The button stays available and focus stays where the user left it. Translate
+the button and application status messages alongside your content.
 
-### Attributes
+For a network update, check `response.ok`, validate the response, and prepare
+the new content before replacing the existing data. Use `textContent` for
+untrusted text. Report failures visibly and provide a retry action.
 
-| Attribute           | Type    | Default       | Description                                 |
-| ------------------- | ------- | ------------- | ------------------------------------------- |
-| `threshold`         | number  | `80`          | Distance in pixels to trigger refresh       |
-| `indicator-text`    | string  | localized     | Text shown when pulling down                |
-| `release-text`      | string  | localized     | Text shown when ready to release            |
-| `refreshing-text`   | string  | localized     | Text shown while refreshing                 |
-| `lang`              | string  | auto-detected | Language code for localization              |
-| `disabled`          | boolean | `false`       | Disables pull-to-refresh functionality      |
-| `disable-selection` | boolean | `false`       | Prevents text selection during pull gesture |
+## Behavior and completion
 
-**Note:** The text attributes use automatic localization based on the `lang` attribute or auto-detection. See [Localization](#-localization-i18n) below.
+- The host defaults to `height: 100vh`, with an internal vertical scroll
+  container. Set the host’s height to fit your layout.
+- A downward movement greater than 5 pixels confirms a pull. Release must
+  exceed `threshold` to trigger refresh; matching it exactly isn’t enough.
+- `disabled` removes gesture listeners and resets the indicator. It doesn’t
+  disable your button or prevent a direct `triggerRefresh()` call.
+- `disable-selection` suppresses selection on slotted content during a
+  confirmed pull. Release removes the `pulling` attribute and restores
+  selection styling. Removing `disable-selection` also removes `pulling`.
+- Without upgrade, authored content and forms remain ordinary HTML.
+- On disconnect, the component removes its gesture/scroll listeners and
+  clears its completion and announcement timers. It doesn’t cancel your
+  application’s work or reset all interaction state. Cancel or guard your own
+  pending updates when removing the component.
 
-### Properties
+Call `event.detail.complete()` in `finally` for both success and failure.
+`completeRefresh()` is the equivalent method. Both end the interaction and
+fire `ptr:refresh-complete`; neither means the data update succeeded.
 
-All attributes are also available as properties:
+The component schedules automatic completion **two seconds after dispatching
+`ptr:refresh`**, even when a listener is still working. That timer does not wait
+for a promise returned by your handler. `triggerRefresh()`’s returned promise
+also doesn’t await your work. Keep application loading and outcome messages
+separate from `ptr:refresh-complete`, and guard overlapping work. A later
+explicit completion fires another completion event. Calling completion again
+isn’t a success signal.
 
-```javascript
-const ptr = document.querySelector('pull-to-refresh');
-ptr.threshold = 120;
-ptr.indicatorText = 'Swipe down';
-ptr.disabled = true;
-```
+## Attributes and properties
 
-### Events
+Properties reflect their corresponding attributes. Pre-upgrade property
+assignments are preserved.
 
-| Event                  | Detail                   | Description                     |
-| ---------------------- | ------------------------ | ------------------------------- |
-| `ptr:pull-start`       | `{}`                     | Fired when pull gesture starts  |
-| `ptr:pull-move`        | `{ distance: number }`   | Fired during pull gesture       |
-| `ptr:pull-end`         | `{}`                     | Fired when pull gesture ends    |
-| `ptr:refresh`          | `{ complete: Function }` | Fired when refresh is triggered |
-| `ptr:refresh-complete` | `{}`                     | Fired when refresh completes    |
+| Attribute           | Property           | Default           | Behavior                                                                                                                                                                |
+| ------------------- | ------------------ | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `threshold`         | `threshold`        | `80`              | Pull distance in pixels. Invalid or negative values remove the attribute and restore the default. Attribute reads use integer parsing; the setter rounds valid numbers. |
+| `indicator-text`    | `indicatorText`    | Localized         | Message while pulling. A nonempty override takes precedence over translations.                                                                                          |
+| `release-text`      | `releaseText`      | Localized         | Message beyond the threshold.                                                                                                                                           |
+| `refreshing-text`   | `refreshingText`   | Localized         | Message while the interaction is refreshing.                                                                                                                            |
+| `lang`              | `lang`             | Inherited or `en` | Language used to select indicator messages.                                                                                                                             |
+| `disabled`          | `disabled`         | `false`           | Boolean attribute; presence disables gesture listeners.                                                                                                                 |
+| `disable-selection` | `disableSelection` | `false`           | Boolean attribute; presence suppresses selection during a confirmed pull.                                                                                               |
 
-**Important**: Call `event.detail.complete()` in your `ptr:refresh` handler to signal completion:
+Set text properties to `null` or `undefined` to remove an override. Empty text
+attributes also fall back to the translation. Set `threshold` to `null`,
+`undefined`, or `''` to restore its default.
+See [Localization](#localization-i18n) for message precedence and language selection.
 
-```javascript
-ptr.addEventListener('ptr:refresh', (e) => {
-  doAsyncWork().then(() => {
-    e.detail.complete(); // Call this when done
-  });
-});
-```
+## Methods and events
 
-If you don't call `complete()`, the component will auto-complete after 2 seconds.
+| Method                                                    | Behavior                                                                                                                                                    |
+| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `triggerRefresh()`                                        | Starts a refresh and dispatches `ptr:refresh`, unless `isRefreshing` is already true. Works independently of `disabled`; doesn’t wait for application work. |
+| `completeRefresh()`                                       | Ends the interaction, resets the indicator, clears the completion timer, and dispatches `ptr:refresh-complete`.                                             |
+| `PullToRefreshElement.registerTranslations(translations)` | Adds or replaces language entries for indicator messages.                                                                                                   |
 
-### Slots
+`isRefreshing` reports component interaction state, not application loading or
+success. Don’t use it as your only guard for work lasting longer than two seconds.
 
-| Slot        | Description                       |
-| ----------- | --------------------------------- |
-| (default)   | Your scrollable content           |
-| `indicator` | Optional custom indicator element |
+All these events bubble and cross shadow boundaries:
 
-### CSS Custom Properties
-
-| Property                    | Default      | Description                       |
-| --------------------------- | ------------ | --------------------------------- |
-| `--ptr-indicator-height`    | `3.125rem`   | Height of the indicator area      |
-| `--ptr-indicator-bg`        | `ButtonFace` | Background color of indicator     |
-| `--ptr-indicator-color`     | `ButtonText` | Text color of indicator           |
-| `--ptr-indicator-font-size` | `0.875rem`   | Font size of indicator text       |
-| `--ptr-transition-duration` | `0.2s`       | Duration of indicator transitions |
-
-### Methods
-
-| Method              | Description                                                                      |
-| ------------------- | -------------------------------------------------------------------------------- |
-| `completeRefresh()` | Manually complete the refresh (alternative to calling `event.detail.complete()`) |
-
-## Examples
-
-### Custom Threshold
-
-```html
-<pull-to-refresh threshold="120">
-  <div>Content here</div>
-</pull-to-refresh>
-```
-
-### Localization
-
-The component automatically detects the language and displays localized text:
-
-```html
-<!-- Spanish -->
-<pull-to-refresh lang="es">
-  <div>Contenido aquí</div>
-</pull-to-refresh>
-
-<!-- French -->
-<pull-to-refresh lang="fr">
-  <div>Contenu ici</div>
-</pull-to-refresh>
-
-<!-- Japanese -->
-<pull-to-refresh lang="ja">
-  <div>ここにコンテンツ</div>
-</pull-to-refresh>
-```
-
-The component supports 16 languages with automatic fallback to English. Language is detected from:
-
-1. The element's `lang` attribute
-2. The nearest ancestor's `lang` attribute
-3. The document's `lang` attribute
-4. Default: English
-
-You can also register custom translations:
-
-```javascript
-import { PullToRefreshElement } from '@aarongustafson/pull-to-refresh';
-
-PullToRefreshElement.registerTranslations({
-  'pt-BR': {
-    indicator: '↓ Puxe para atualizar',
-    release: '↻ Solte para atualizar',
-    refreshing: '⏳ Atualizando...',
-  },
-});
-```
-
-### Custom Styling
-
-```html
-<style>
-  pull-to-refresh {
-    --ptr-indicator-bg: #102030;
-    --ptr-indicator-color: #ffffff;
-    --ptr-indicator-font-size: 1rem;
-    --ptr-indicator-height: 3.75rem;
-  }
-</style>
-
-<pull-to-refresh>
-  <div>Content here</div>
-</pull-to-refresh>
-```
-
-The indicator defaults to `ButtonText` on `ButtonFace`. Set
-`--ptr-indicator-bg` and `--ptr-indicator-color` together; changing one can
-make the other unreadable. Custom properties override these defaults and
-inherit from the host. A custom slotted indicator supplies its own markup
-and styles. Test your complete pair, including nested text, in each supported
-scheme and user palette. Automatic forced-color adjustment remains enabled.
-The indicator uses different authored or localized messages for pulling,
-release, and loading, rather than color alone.
-
-The demos use `CanvasText` on `Canvas` for reading surfaces and status
-messages, `ButtonText` on `ButtonFace` for code and buttons, and
-`MarkText` on `Mark` for marked examples. They preserve native keyboard focus.
-Each standalone demo includes a native Refresh form: enhancement runs the
-existing refresh handler; without JavaScript or a successful module load,
-the form reloads the document. The component does not generate a keyboard
-button. Supply one for tasks that must not depend on a pull gesture.
-Keep existing data visible during loading or failure, provide a readable
-error and retry action, and call `event.detail.complete()` when your handler
-finishes. Completion reports the end of the interaction, not success.
-
-Recorded-palette substitution and browser emulation are regression checks,
-not proof of native high-contrast repainting or assistive-technology support.
-The recorded study’s 19 distinct palettes pass the tested demo pairs; bundled
-Ubuntu WebKit has a known dark `ButtonText`/`ButtonFace` contrast limitation
-outside that dataset. The browser suite tracks it as a narrowly scoped expected
-failure instead of replacing every platform’s native pair.
-
-### Custom Messages
-
-```html
-<pull-to-refresh
-  indicator-text="⬇ Swipe down"
-  release-text="🔄 Let go!"
-  refreshing-text="⏳ Loading..."
->
-  <div>Content here</div>
-</pull-to-refresh>
-```
-
-### With Fetch API
-
-```javascript
-ptr.addEventListener('ptr:refresh', async (e) => {
-  try {
-    const response = await fetch('/api/latest');
-    const data = await response.json();
-    renderData(data);
-  } catch (error) {
-    console.error('Refresh failed:', error);
-  } finally {
-    e.detail.complete();
-  }
-});
-```
-
-### Disabled State
-
-```html
-<!-- Disable pull-to-refresh when needed -->
-<pull-to-refresh disabled>
-  <div>No refresh available</div>
-</pull-to-refresh>
-
-<script>
-  // Or toggle programmatically
-  ptr.disabled = true;
-</script>
-```
-
-### Tracking Pull Distance
-
-```javascript
-ptr.addEventListener('ptr:pull-move', (e) => {
-  console.log('Pull distance:', e.detail.distance);
-  // Use this for custom animations, etc.
-});
-```
+| Event                  | Detail                   | When it fires                                          |
+| ---------------------- | ------------------------ | ------------------------------------------------------ |
+| `ptr:pull-start`       | No detail payload        | Downward movement confirms a pull.                     |
+| `ptr:pull-move`        | `{ distance: number }`   | A confirmed downward pull moves.                       |
+| `ptr:pull-end`         | No detail payload        | An active pull ends, even below the threshold.         |
+| `ptr:refresh`          | `{ complete: Function }` | A gesture or `triggerRefresh()` starts a refresh.      |
+| `ptr:refresh-complete` | No detail payload        | Explicit or automatic completion ends the interaction. |
 
 ## Localization (i18n)
 
-The component includes built-in translations for **16 languages**:
-
-| Language           | Code | Indicator Text               |
-| ------------------ | ---- | ---------------------------- |
-| English            | `en` | ↓ Pull to refresh            |
-| Chinese (Mandarin) | `zh` | ↓ 下拉刷新                   |
-| Hindi              | `hi` | ↓ रीफ्रेश करने के लिए खींचें |
-| Spanish            | `es` | ↓ Desliza para actualizar    |
-| French             | `fr` | ↓ Tirez pour actualiser      |
-| Arabic             | `ar` | ↓ اسحب للتحديث               |
-| Bengali            | `bn` | ↓ রিফ্রেশ করতে টানুন         |
-| Portuguese         | `pt` | ↓ Puxe para atualizar        |
-| Russian            | `ru` | ↓ Потяните для обновления    |
-| Japanese           | `ja` | ↓ 引っ張って更新             |
-| German             | `de` | ↓ Zum Aktualisieren ziehen   |
-| Punjabi            | `pa` | ↓ ਤਾਜ਼ਾ ਕਰਨ ਲਈ ਖਿੱਚੋ         |
-| Javanese           | `jv` | ↓ Tarik kanggo nyegerake     |
-| Korean             | `ko` | ↓ 당겨서 새로고침            |
-| Vietnamese         | `vi` | ↓ Kéo để làm mới             |
-| Italian            | `it` | ↓ Trascina per aggiornare    |
-
-### Language Detection
-
-The component uses a cascading fallback approach:
-
-1. Element's `lang` attribute: `&lt;pull-to-refresh lang="es"&gt;`
-2. Nearest ancestor with `lang`: `&lt;div lang="fr"&gt;&lt;pull-to-refresh&gt;`
-3. Document language: `&lt;html lang="de"&gt;`
-4. Default: English (en)
-
-Regional variants (e.g., `en-US`, `es-MX`, `fr-CA`) automatically fall back to their base language.
-
-### Custom Translations
-
-Register custom translations or override existing ones:
-
-```javascript
-import { PullToRefreshElement } from '@aarongustafson/pull-to-refresh';
-
-// Add a new language
-PullToRefreshElement.registerTranslations({
-  nl: {
-    indicator: '↓ Trek om te vernieuwen',
-    release: '↻ Loslaten om te vernieuwen',
-    refreshing: '⏳ Vernieuwen...',
-  },
-});
-
-// Override existing translations
-PullToRefreshElement.registerTranslations({
-  en: {
-    indicator: '⬇ Pull down',
-    release: '🔄 Let go',
-    refreshing: '⏳ Loading...',
-  },
-});
-```
-
-### Per-Instance Overrides
-
-You can always override translations for individual instances:
+Use text attributes to match your application’s vocabulary before adding
+translations:
 
 ```html
 <pull-to-refresh
-  lang="es"
-  indicator-text="Custom Spanish text"
-  release-text="Custom release text"
+  indicator-text="↓ Pull to check for updates"
+  release-text="↻ Release to check"
+  refreshing-text="⏳ Checking for updates..."
 >
-  <!-- Content -->
+  <!-- Your content and native Refresh form -->
 </pull-to-refresh>
 ```
 
-## Testing
+Language selection uses the element’s nonempty `lang`, its nearest `[lang]`
+ancestor, the document language, and then `en`. The component resolves inherited
+language when it connects; changing an ancestor’s language alone doesn’t update
+an already connected indicator. Changing the element’s `lang` does.
+Regional codes such as `es-MX` use their base language. Unknown codes fall back
+to English. See [translations.json](./translations.json) for the built-in
+messages and supported codes.
 
-```bash
-npm test               # Run tests in watch mode
-npm run test:run       # Run tests once
-npm run test:ui        # Open Vitest UI
-npm run test:coverage  # Generate coverage report
-```
-
-## Development
-
-```bash
-npm install            # Install dependencies
-npm run setup          # Run setup wizard (first time)
-npm run lint           # Lint code
-npm run format         # Format code
-```
-
-## Browser Support
-
-Works in all modern browsers supporting:
-
-- Custom Elements v1
-- Shadow DOM v1
-- ES Modules
-- Pointer Events
-
-For legacy browsers, use appropriate polyfills.
-
-## Package Exports
+Register shared vocabulary or translations before the elements connect:
 
 ```javascript
-// Auto-define
-import '@aarongustafson/pull-to-refresh';
-
-// Class only
-import { PullToRefreshElement } from '@aarongustafson/pull-to-refresh/pull-to-refresh.js';
-
-// Both
 import { PullToRefreshElement } from '@aarongustafson/pull-to-refresh';
 
-// Manual define script
-import '@aarongustafson/pull-to-refresh/define.js';
+PullToRefreshElement.registerTranslations({
+  en: {
+    indicator: '↓ Pull to check for updates',
+    release: '↻ Release to check',
+    refreshing: '⏳ Checking for updates...',
+  },
+});
+
+customElements.define('pull-to-refresh', PullToRefreshElement);
 ```
 
-## Contributing
+Registration replaces whole language entries, so supply all three keys:
+`indicator`, `release`, and `refreshing`. Register base codes such as `pt`, not
+`pt-BR`, because lookup uses the base code. Per-instance text attributes take
+precedence. Registration alone doesn’t redraw connected indicators.
 
-Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Only the indicator messages are translated by the component. Authors translate
+content, buttons, loading messages, errors, and retry instructions. The
+[Spanish, French, and Japanese demos](./demo/index.html#localization) inherit
+their language from each embedded document’s `<html lang>`.
+
+## Styling
+
+| Custom property             | Default      | Purpose                                                                        |
+| --------------------------- | ------------ | ------------------------------------------------------------------------------ |
+| `--ptr-indicator-height`    | `3.125rem`   | Indicator area height. Gesture positioning still uses a fixed 50-pixel height. |
+| `--ptr-indicator-bg`        | `ButtonFace` | Indicator background.                                                          |
+| `--ptr-indicator-color`     | `ButtonText` | Indicator foreground.                                                          |
+| `--ptr-indicator-font-size` | `0.875rem`   | Indicator text size.                                                           |
+| `--ptr-transition-duration` | `0.2s`       | Indicator transition duration.                                                 |
+
+Set foreground and background together:
+
+```css
+pull-to-refresh {
+  --ptr-indicator-bg: #102030;
+  --ptr-indicator-color: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  pull-to-refresh {
+    --ptr-transition-duration: 0s;
+  }
+}
+```
+
+Test the pair in light, dark, and user-selected palettes. Automatic forced-color
+adjustment remains enabled. Messages distinguish pulling, release, and loading
+without relying on color alone.
+
+The default slot holds your content. The optional `indicator` slot replaces the
+default message with authored markup and styles; your application must update
+that custom indicator’s state text. There are no exposed CSS parts.
+
+## Accessibility and compatibility
+
+The indicator uses `role="status"` with assertive live announcements; the
+component temporarily turns announcements off while resetting it. Supply a
+separate visible application status, preserve existing data on failure, and
+keep a native Refresh action. The gesture alone isn’t a keyboard alternative.
+Test focus, announcements, touch scrolling, and browser pull-to-refresh behavior
+on the devices and assistive technologies your application supports.
+
+The runtime uses Custom Elements, Shadow DOM, modules with JSON import
+attributes, and Pointer Events. If registration cannot load, the authored
+content and native form remain available. Browser emulation and the recorded
+palette checks aren’t proof of native high-contrast repainting or screen-reader
+behavior. The browser suite tracks a known Ubuntu WebKit dark
+`ButtonText`/`ButtonFace` contrast limitation as an expected failure.
+
+## Development and testing
+
+```sh
+npm install
+npm run lint
+npm run format
+npm run test:run
+npm run test:browser
+```
+
+`npm test` runs watch mode; `npm run test:ui` opens the Vitest UI, and
+`npm run test:coverage` collects coverage. See [CONTRIBUTING.md](./CONTRIBUTING.md)
+for contributor guidance and [the demo guide](./demo/README.md) for ownership.
 
 ## License
 
-MIT - See [LICENSE](LICENSE)
-
-## Credits
-
-Created by [Aaron Gustafson](https://github.com/aarongustafson)
-
----
-
-**Try it out!** Check out the [live demo](https://aarongustafson.github.io/pull-to-refresh/demo/index.html) 🚀
+MIT — see [LICENSE](./LICENSE).

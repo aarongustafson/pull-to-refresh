@@ -22,7 +22,8 @@ body {
 	overflow-wrap: anywhere;
 }
 
-body:not([data-demo-variant='compact']) > pull-to-refresh {
+body:not([data-demo-variant='compact']) > section,
+body:not([data-demo-variant='compact']) > section > pull-to-refresh {
 	height: 100%;
 }
 
