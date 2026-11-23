@@ -13,8 +13,9 @@
 			<p class="eyebrow">Web component / Examples</p>
 			<h1>&lt;pull-to-refresh&gt;</h1>
 			<p class="lede">
-				Refreshes the current document or runs a specific JavaScript
-				function when pulling down on the page. See the
+				Adds a downward pull gesture to scrollable content. Your
+				application handles the refresh event, updates the content, and
+				reports success or failure. See the
 				<a
 					href="https://github.com/aarongustafson/pull-to-refresh/blob/main/README.md"
 					>README</a
@@ -58,20 +59,24 @@
 				</p></noscript
 			>
 			<!-- Basic Example -->
-			<section>
+			<section id="basic">
 				<h2>Basic Example</h2>
 				<p>
-					Pull down from the top to trigger a refresh. The random
-					number will update. Use “Simulate a failed refresh” to keep
-					the previous number and show a retry message. The Refresh
-					button works with a keyboard.
+					At the top of the content, pull down and release past the
+					threshold, or use the native Refresh button with a keyboard.
+					This handler generates a number locally; your application
+					would load and validate its own data.
 				</p>
 
-				<div class="demo-section">
+				<div class="demo-section" id="basic-usage">
 					<h3>Basic Usage</h3>
 					<p>
-						The component listens for pull gestures and fires a
-						<code>ptr:refresh</code> event.
+						Keep the existing number visible while loading. Report
+						the outcome in a visible status and call
+						<code>event.detail.complete()</code> in
+						<code>finally</code>, whether the update succeeds or
+						fails. Without JavaScript or registration, the form
+						reloads the document.
 					</p>
 					<div class="code-demo-pair">
 						<micro-lighter
@@ -83,13 +88,52 @@
 							<pre
 								aria-label="Basic Usage code 1"
 								tabindex="0"
-							><code><mark>&lt;pull-to-refresh&gt;</mark>
-  &lt;div class="content"&gt;
+							><code><mark>&lt;pull-to-refresh id="demo"&gt;</mark>
+  &lt;div class="demo-content"&gt;
     &lt;h3&gt;My Content&lt;/h3&gt;
-    &lt;p&gt;Pull down to refresh&lt;/p&gt;
-    &lt;p&gt;Random: &lt;span id="random1"&gt;0&lt;/span&gt;&lt;/p&gt;
+    &lt;p&gt;At the top, pull down and release, or use Refresh.&lt;/p&gt;
+    &lt;p&gt;Random number: &lt;span id="random"&gt;0&lt;/span&gt;&lt;/p&gt;
+    &lt;div id="status" role="status"&gt;Ready&lt;/div&gt;
+    &lt;form data-refresh&gt;
+      &lt;button type="submit"&gt;Refresh&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;p&gt;The Refresh button reloads the page if enhancement fails.&lt;/p&gt;
   &lt;/div&gt;
-<mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
+<mark>&lt;/pull-to-refresh&gt;</mark>
+&lt;script type="module"&gt;
+  <mark>import '../define.js';</mark>
+
+  const demo = document.getElementById('demo');
+  const random = document.getElementById('random');
+  const status = document.getElementById('status');
+  let pending = false;
+
+  document.querySelector('[data-refresh]').addEventListener('submit', (event) =&gt; {
+    event.preventDefault();
+    if (!pending) <mark>demo.triggerRefresh()</mark>;
+  });
+
+  demo.addEventListener(<mark>'ptr:refresh'</mark>, async (event) =&gt; {
+    if (pending) {
+      <mark>event.detail.complete()</mark>;
+      return;
+    }
+    pending = true;
+    status.textContent = 'Refreshing...';
+    try {
+      await new Promise((resolve) =&gt; setTimeout(resolve, 1500));
+      const nextNumber = Math.floor(Math.random() * 1000);
+      random.textContent = nextNumber;
+      status.textContent = 'Complete! Use Refresh or pull again.';
+    } catch {
+      status.textContent =
+        'Refresh failed. Your previous number is unchanged. Use Refresh to try again.';
+    } finally {
+      pending = false;
+      <mark>event.detail.complete()</mark>;
+    }
+  });
+&lt;/script&gt;</code></pre>
 						</micro-lighter>
 						<div class="demo" data-demo-label="Live example">
 							<iframe
@@ -105,17 +149,30 @@
 						</div>
 					</div>
 				</div>
+				<p>
+					Completion ends the component’s interaction, not the
+					application’s work. The component automatically completes
+					after two seconds, even if a handler is still running. Keep
+					a separate loading guard and report success or failure from
+					your handler, not from
+					<code>ptr:refresh-complete</code>. See
+					<a
+						href="https://github.com/aarongustafson/pull-to-refresh/blob/main/README.md#behavior-and-completion"
+						>completion behavior</a
+					>.
+				</p>
 			</section>
 
 			<!-- Custom Threshold Example -->
-			<section>
+			<section id="threshold">
 				<h2>Custom Threshold</h2>
 				<p>
-					Demonstrating a custom threshold distance (120px instead of
-					default 80px).
+					Set <code>threshold="120"</code> to require a longer pull
+					than the default 80 pixels. Release beyond 120 pixels to
+					trigger refresh.
 				</p>
 
-				<div class="demo-section">
+				<div class="demo-section" id="longer-pull">
 					<h3>Using threshold Attribute</h3>
 					<p>You need to pull further down to trigger the refresh.</p>
 					<div class="code-demo-pair">
@@ -130,7 +187,7 @@
 								tabindex="0"
 							><code><mark>&lt;pull-to-refresh threshold="120"&gt;</mark>
   &lt;div class="content"&gt;
-    &lt;p&gt;Pull 120px to refresh&lt;/p&gt;
+    &lt;p&gt;Pull beyond 120px to refresh&lt;/p&gt;
   &lt;/div&gt;
 <mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
 						</micro-lighter>
@@ -151,13 +208,26 @@
 			</section>
 
 			<!-- Custom Text Example -->
-			<section>
+			<section id="custom-text">
 				<h2>Custom Indicator Text</h2>
-				<p>Customize the text shown in the pull indicator.</p>
+				<p>
+					Use your application’s vocabulary in the indicator before
+					translating it. These attributes change one instance;
+					<a
+						href="https://github.com/aarongustafson/pull-to-refresh/blob/main/README.md#localization-i18n"
+						>register translations</a
+					>
+					to share messages across instances.
+				</p>
 
-				<div class="demo-section">
+				<div class="demo-section" id="custom-messages">
 					<h3>Custom Messages</h3>
-					<p>Using custom text for the indicator states.</p>
+					<p>
+						Here, “check for updates” replaces the default refresh
+						messages. Select “Simulate a failed refresh,” then use
+						Refresh to see the previous number stay visible with a
+						retry message. The next attempt can succeed.
+					</p>
 					<div class="code-demo-pair">
 						<micro-lighter
 							class="code-panel"
@@ -169,9 +239,9 @@
 								aria-label="Custom Messages code 3"
 								tabindex="0"
 							><code><mark>&lt;pull-to-refresh
-  indicator-text="⬇ Swipe down"
-  release-text="🔄 Let go!"
-  refreshing-text="⏳ Loading..."&gt;</mark>
+  indicator-text="↓ Pull to check for updates"
+  release-text="↻ Release to check"
+  refreshing-text="⏳ Checking for updates..."&gt;</mark>
   &lt;div class="content"&gt;
     &lt;p&gt;Custom messages&lt;/p&gt;
   &lt;/div&gt;
@@ -194,7 +264,7 @@
 			</section>
 
 			<!-- Disable Selection Example -->
-			<section>
+			<section id="disable-selection">
 				<h2>Disable Text Selection</h2>
 				<p>
 					By default, text selection is allowed during pull gestures.
@@ -203,11 +273,12 @@
 					accidental text selection while pulling.
 				</p>
 
-				<div class="demo-section">
+				<div class="demo-section" id="selection-restoration">
 					<h3>Using disable-selection Attribute</h3>
 					<p>
-						Text selection is blocked during the pull gesture. Try
-						selecting text while pulling down to see the difference.
+						Text selection is blocked during a confirmed pull and
+						restored on release. Try selecting text before and after
+						the gesture.
 					</p>
 					<div class="code-demo-pair">
 						<micro-lighter
@@ -241,16 +312,21 @@
 				</div>
 			</section>
 			<!-- Localization Example -->
-			<section>
+			<section id="localization">
 				<h2>Localization (i18n)</h2>
 				<p>
-					The component automatically detects language and uses
-					appropriate translations for 16 languages.
+					Each embedded page declares its language on
+					<code>&lt;html&gt;</code>. The component inherits it;
+					buttons, content, and application status messages are
+					translated separately by the author.
 				</p>
 
-				<div class="demo-section">
+				<div class="demo-section" id="spanish">
 					<h3>Spanish (Español)</h3>
-					<p>Using the <code>lang="es"</code> attribute.</p>
+					<p>
+						The embedded document uses
+						<code>&lt;html lang="es"&gt;</code>.
+					</p>
 					<div class="code-demo-pair">
 						<micro-lighter
 							class="code-panel"
@@ -261,11 +337,13 @@
 							<pre
 								aria-label="Spanish (Español) code 5"
 								tabindex="0"
-							><code><mark>&lt;pull-to-refresh lang="es"&gt;</mark>
+							><code>&lt;html lang="es"&gt;
+<mark>&lt;pull-to-refresh&gt;</mark>
   &lt;div class="content"&gt;
     &lt;p&gt;Contenido en español&lt;/p&gt;
   &lt;/div&gt;
-<mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
+<mark>&lt;/pull-to-refresh&gt;</mark>
+&lt;/html&gt;</code></pre>
 						</micro-lighter>
 						<div class="demo" data-demo-label="Live example">
 							<iframe
@@ -282,9 +360,12 @@
 					</div>
 				</div>
 
-				<div class="demo-section">
+				<div class="demo-section" id="french">
 					<h3>French (Français)</h3>
-					<p>Using the <code>lang="fr"</code> attribute.</p>
+					<p>
+						The embedded document uses
+						<code>&lt;html lang="fr"&gt;</code>.
+					</p>
 					<div class="code-demo-pair">
 						<micro-lighter
 							class="code-panel"
@@ -295,11 +376,13 @@
 							<pre
 								aria-label="French (Français) code 6"
 								tabindex="0"
-							><code><mark>&lt;pull-to-refresh lang="fr"&gt;</mark>
+							><code>&lt;html lang="fr"&gt;
+<mark>&lt;pull-to-refresh&gt;</mark>
   &lt;div class="content"&gt;
     &lt;p&gt;Contenu en français&lt;/p&gt;
   &lt;/div&gt;
-<mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
+<mark>&lt;/pull-to-refresh&gt;</mark>
+&lt;/html&gt;</code></pre>
 						</micro-lighter>
 						<div class="demo" data-demo-label="Live example">
 							<iframe
@@ -316,9 +399,12 @@
 					</div>
 				</div>
 
-				<div class="demo-section">
+				<div class="demo-section" id="japanese">
 					<h3>Japanese (日本語)</h3>
-					<p>Using the <code>lang="ja"</code> attribute.</p>
+					<p>
+						The embedded document uses
+						<code>&lt;html lang="ja"&gt;</code>.
+					</p>
 					<div class="code-demo-pair">
 						<micro-lighter
 							class="code-panel"
@@ -329,11 +415,13 @@
 							<pre
 								aria-label="Japanese (日本語) code 7"
 								tabindex="0"
-							><code><mark>&lt;pull-to-refresh lang="ja"&gt;</mark>
+							><code>&lt;html lang="ja"&gt;
+<mark>&lt;pull-to-refresh&gt;</mark>
   &lt;div class="content"&gt;
     &lt;p&gt;日本語のコンテンツ&lt;/p&gt;
   &lt;/div&gt;
-<mark>&lt;/pull-to-refresh&gt;</mark></code></pre>
+<mark>&lt;/pull-to-refresh&gt;</mark>
+&lt;/html&gt;</code></pre>
 						</micro-lighter>
 						<div class="demo" data-demo-label="Live example">
 							<iframe
@@ -349,125 +437,6 @@
 						</div>
 					</div>
 				</div>
-
-				<div class="demo-section">
-					<h3>Supported Languages</h3>
-					<p>The component includes built-in translations for:</p>
-					<ul style="columns: 2; -webkit-columns: 2; -moz-columns: 2">
-						<li>English (en)</li>
-						<li>Chinese/中文 (zh)</li>
-						<li>Hindi/हिन्दी (hi)</li>
-						<li>Spanish/Español (es)</li>
-						<li>French/Français (fr)</li>
-						<li>Arabic/العربية (ar)</li>
-						<li>Bengali/বাংলা (bn)</li>
-						<li>Portuguese/Português (pt)</li>
-						<li>Russian/Русский (ru)</li>
-						<li>Japanese/日本語 (ja)</li>
-						<li>German/Deutsch (de)</li>
-						<li>Punjabi/ਪੰਜਾਬੀ (pa)</li>
-						<li>Javanese (jv)</li>
-						<li>Korean/한국어 (ko)</li>
-						<li>Vietnamese/Tiếng Việt (vi)</li>
-						<li>Italian/Italiano (it)</li>
-					</ul>
-					<p>
-						Regional variants (e.g., <code>en-US</code>,
-						<code>es-MX</code>) automatically fall back to the base
-						language.
-					</p>
-				</div>
-			</section>
-
-			<!-- API Reference -->
-			<section class="api-reference">
-				<h2>API Reference</h2>
-
-				<h3>Attributes</h3>
-				<ul>
-					<li>
-						<code>threshold</code> - Distance in pixels to trigger
-						refresh (default: 80)
-					</li>
-					<li>
-						<code>indicator-text</code> - Text when pulling
-						(default: localized "↓ Pull to refresh")
-					</li>
-					<li>
-						<code>release-text</code> - Text when ready to release
-						(default: localized "↻ Release to refresh")
-					</li>
-					<li>
-						<code>refreshing-text</code> - Text while refreshing
-						(default: localized "⏳ Refreshing...")
-					</li>
-					<li>
-						<code>lang</code> - Language code for localization
-						(auto-detected from element, ancestor, or document)
-					</li>
-					<li>
-						<code>disabled</code> - Disables pull-to-refresh
-						functionality
-					</li>
-					<li>
-						<code>disable-selection</code> - Prevents text selection
-						during pull gesture
-					</li>
-				</ul>
-				<h3>Events</h3>
-				<ul>
-					<li>
-						<code>ptr:pull-start</code> - Fired when pull gesture
-						starts
-					</li>
-					<li>
-						<code>ptr:pull-move</code> - Fired during pull (detail
-						contains distance)
-					</li>
-					<li>
-						<code>ptr:pull-end</code> - Fired when pull gesture ends
-					</li>
-					<li>
-						<code>ptr:refresh</code> - Fired when refresh is
-						triggered
-					</li>
-					<li>
-						<code>ptr:refresh-complete</code> - Fired when refresh
-						completes
-					</li>
-				</ul>
-
-				<h3>CSS Custom Properties</h3>
-				<ul>
-					<li>
-						<code>--ptr-indicator-height</code> - Height of
-						indicator (default: 3.125rem)
-					</li>
-					<li>
-						<code>--ptr-indicator-bg</code> - Indicator background
-						(default: ButtonFace)
-					</li>
-					<li>
-						<code>--ptr-indicator-color</code> - Indicator text
-						color (default: ButtonText)
-					</li>
-					<li>
-						<code>--ptr-indicator-font-size</code> - Indicator font
-						size (default: 0.875rem)
-					</li>
-					<li>
-						<code>--ptr-transition-duration</code> - Transition
-						duration (default: 0.2s)
-					</li>
-				</ul>
-
-				<p>
-					For complete documentation and browser support, see the
-					<a
-						href="https://github.com/aarongustafson/pull-to-refresh/blob/main/README.md"
-						>README</a
-					>.
-				</p>
 			</section>
 		</main>
 

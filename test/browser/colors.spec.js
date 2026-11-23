@@ -293,12 +293,19 @@ test('native keyboard focus and localized loading/completion keep focus and data
 test('authored refresh failure preserves data, releases loading and supports keyboard retry', async ({
 	page,
 }) => {
-	await demo(page);
+	await demo(page, 'custom-text');
 	await page.getByLabel('Simulate a failed refresh').check();
 	await page.getByRole('button', { name: 'Refresh' }).focus();
 	await page.keyboard.press('Enter');
 	await expect(page.locator('#status')).toContainText('Refresh failed');
 	await expect(page.locator('#random')).toHaveText('0');
+	await expect
+		.poll(() =>
+			page
+				.locator('pull-to-refresh')
+				.evaluate((node) => node.isRefreshing),
+		)
+		.toBe(false);
 	await expect(page.getByRole('button', { name: 'Refresh' })).toBeFocused();
 	await expect(
 		page.getByLabel('Simulate a failed refresh'),
@@ -306,6 +313,172 @@ test('authored refresh failure preserves data, releases loading and supports key
 	await page.keyboard.press('Enter');
 	await expect(page.locator('#status')).toContainText('Complete');
 });
+
+test('each authored example has a unique fragment destination around its heading and live content', async ({
+	page,
+}) => {
+	for (const name of [
+		'index',
+		'esm',
+		'unpkg',
+		'basic',
+		'threshold',
+		'custom-text',
+		'selection-disabled',
+		'spanish',
+		'french',
+		'japanese',
+	]) {
+		await demo(page, name);
+		const blocks = await page.evaluate(() => {
+			const ids = [...document.querySelectorAll('[id]')].map(
+				(node) => node.id,
+			);
+			return [
+				...document.querySelectorAll(
+					'.code-demo-pair, body[data-demo-page="embedded"] pull-to-refresh',
+				),
+			].map((node) => {
+				const block = node.closest('section, .demo-section');
+				return {
+					id: block?.id,
+					unique: block
+						? ids.filter((id) => id === block.id).length === 1
+						: false,
+					heading: Boolean(block?.querySelector('h2, h3')),
+				};
+			});
+		});
+		expect(blocks.length).toBeGreaterThan(0);
+		for (const block of blocks) {
+			expect(block.id, name).toBeTruthy();
+			expect(block.unique, name).toBe(true);
+			expect(block.heading, name).toBe(true);
+			await page.goto(`/demo/${name}.html#${block.id}`);
+			await expect(page.locator(`#${block.id}`)).toBeVisible();
+		}
+	}
+});
+
+test('basic Refresh catches update failures, completes and supports keyboard recovery', async ({
+	page,
+}) => {
+	await demo(page);
+	await page.clock.install();
+	await page.evaluate(() => {
+		window.refreshCompletions = 0;
+		document.addEventListener('ptr:refresh-complete', () => {
+			window.refreshCompletions += 1;
+		});
+		const original = Math.random;
+		Math.random = () => {
+			throw new Error('Demo update failed');
+		};
+		window.restoreRandom = () => {
+			Math.random = original;
+		};
+	});
+	await page.getByRole('button', { name: 'Refresh' }).focus();
+	await page.keyboard.press('Enter');
+	await expect(page.locator('#status')).toHaveText('Refreshing...');
+	await page.clock.fastForward(1500);
+	await expect(page.locator('#status')).toContainText('Refresh failed');
+	await expect(page.locator('#random')).toHaveText('0');
+	expect(await page.evaluate(() => window.refreshCompletions)).toBe(1);
+	await page.evaluate(() => window.restoreRandom());
+	await page.keyboard.press('Enter');
+	await page.clock.fastForward(1500);
+	await expect(page.locator('#status')).toContainText('Complete');
+	expect(await page.evaluate(() => window.refreshCompletions)).toBe(2);
+	await expect(page.locator('button')).toBeFocused();
+});
+
+test('automatic completion does not announce application success or duplicate a pending update', async ({
+	page,
+}) => {
+	await demo(page);
+	await page.clock.install();
+	await page.evaluate(() => {
+		const schedule = window.setTimeout;
+		window.setTimeout = (callback, delay, ...args) =>
+			schedule(callback, delay === 1500 ? 3000 : delay, ...args);
+		window.updates = 0;
+		Math.random = () => {
+			window.updates += 1;
+			return 0.042;
+		};
+	});
+	await page.getByRole('button', { name: 'Refresh' }).focus();
+	await page.keyboard.press('Enter');
+	await page.clock.fastForward(2000);
+	expect(
+		await page
+			.locator('pull-to-refresh')
+			.evaluate((node) => node.isRefreshing),
+	).toBe(false);
+	await expect(page.locator('#status')).toHaveText('Refreshing...');
+	await expect(page.locator('#random')).toHaveText('0');
+	await page.keyboard.press('Enter');
+	await page.clock.fastForward(1000);
+	await expect(page.locator('#status')).toContainText('Complete');
+	await expect(page.locator('#random')).toHaveText('42');
+	expect(await page.evaluate(() => window.updates)).toBe(1);
+	await expect(page.locator('button')).toBeFocused();
+});
+
+for (const [name, lang, button, loading, complete, failure] of [
+	[
+		'spanish',
+		'es',
+		'Actualizar',
+		'Actualizando...',
+		'¡Completo!',
+		'No se pudo actualizar.',
+	],
+	[
+		'french',
+		'fr',
+		'Actualiser',
+		'Actualisation...',
+		'Terminé',
+		'Échec de l’actualisation.',
+	],
+	['japanese', 'ja', '更新', '更新中...', '完了！', '更新に失敗しました。'],
+]) {
+	test(`${name}: document language, native button and application outcomes stay localized`, async ({
+		page,
+	}) => {
+		await demo(page, name);
+		await expect(page.locator('html')).toHaveAttribute('lang', lang);
+		await expect(page.locator('pull-to-refresh')).not.toHaveAttribute(
+			'lang',
+		);
+		await page.clock.install();
+		await page.getByRole('button', { name: button, exact: true }).focus();
+		await page.keyboard.press('Enter');
+		await expect(page.locator('#status')).toHaveText(loading);
+		await page.clock.fastForward(1500);
+		await expect(page.locator('#status')).toContainText(complete);
+		const previous = await page.locator('#random').textContent();
+		await page.evaluate(() => {
+			Math.random = () => {
+				throw new Error('Update failed');
+			};
+		});
+		await page.keyboard.press('Enter');
+		await page.clock.fastForward(1500);
+		await expect(page.locator('#status')).toContainText(failure);
+		await expect(page.locator('#random')).toHaveText(previous);
+		await expect(
+			page.getByRole('button', { name: button, exact: true }),
+		).toBeFocused();
+		expect(
+			await page
+				.locator('pull-to-refresh')
+				.evaluate((node) => node.isRefreshing),
+		).toBe(false);
+	});
+}
 
 test('gesture threshold, selection restoration and custom paired overrides preserve state cues', async ({
 	page,
@@ -434,7 +607,6 @@ test('forced-color emulation retains automatic adjustment, native focus and labe
 	await page.emulateMedia({ forcedColors: 'active' });
 	await demo(page);
 	await page.keyboard.press('Tab');
-	await page.keyboard.press('Tab');
 	await expect(page.locator('button')).toBeFocused();
 	expect(
 		await page
@@ -476,7 +648,7 @@ for (const mode of [
 			forcedColors: mode.forcedColors,
 		});
 		await demo(page, 'index');
-		const inline = page.locator('.api-reference code').first();
+		const inline = page.locator('#custom-text code').first();
 		const block = page.locator('pre code mark').first();
 		for (const mark of [block]) {
 			expect(await contrast(mark)).toBeGreaterThanOrEqual(4.5);
